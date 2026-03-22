@@ -61,10 +61,10 @@ function StripPreview({ type }: { type: StripType }) {
 }
 
 const OPTIONS: { id: StripType; label: string; desc: string; shots: number; tag?: string }[] = [
-  { id: 'single',  label: 'Single',    desc: '1 perfect shot',              shots: 1             },
-  { id: 'strip3',  label: '3 Strip',   desc: '3 photos, tall strip',        shots: 3             },
-  { id: 'strip4',  label: '4 Strip',   desc: '4 photos, classic booth',     shots: 4, tag: 'Popular' },
-  { id: 'grid2x2', label: '2 × 2',     desc: '4 photos in a square grid',   shots: 4             },
+  { id: 'single', label: 'Single', desc: '1 perfect shot', shots: 1 },
+  { id: 'strip3', label: '3 Strip', desc: '3 photos, tall strip', shots: 3 },
+  { id: 'strip4', label: '4 Strip', desc: '4 photos, classic booth', shots: 4, tag: 'Popular' },
+  { id: 'grid2x2', label: '2 × 2', desc: '4 photos in a square grid', shots: 4 },
 ]
 
 interface Props {
@@ -84,7 +84,7 @@ export default function StripSelector({ selected, onSelect, onNext, onBack }: Pr
           ← Back
         </button>
         <div className="step-bar">
-          {[0,1,2,3].map(i => (
+          {[0, 1, 2, 3].map(i => (
             <div key={i} className={`step-dot ${i === 1 ? 'active' : i < 1 ? 'done' : ''}`} />
           ))}
         </div>
@@ -129,7 +129,7 @@ export default function StripSelector({ selected, onSelect, onNext, onBack }: Pr
               <div className="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center anim-pop"
                 style={{ background: 'var(--rose)' }}>
                 <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                  <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
             )}
