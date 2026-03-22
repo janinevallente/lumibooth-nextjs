@@ -243,7 +243,7 @@ function StickerOverlay({ stickers, onMove, onRemove, onResize, onRotate }: {
     <div
       ref={ref}
       className="absolute inset-0"
-      style={{ touchAction: 'none' }}
+      // style={{ touchAction: 'none' }}
       onClick={handleOverlayClick}
     >
       {stickers.map(s => {
