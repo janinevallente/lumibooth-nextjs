@@ -117,8 +117,8 @@ function rrPath(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, 
   ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y)
   ctx.closePath()
 }
-const rrClip = (ctx: CanvasRenderingContext2D, ...a: Parameters<typeof rrPath>) => { rrPath(ctx, ...a); ctx.clip() }
-const rrStroke = (ctx: CanvasRenderingContext2D, ...a: Parameters<typeof rrPath>) => { rrPath(ctx, ...a); ctx.stroke() }
+const rrClip = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => { rrPath(ctx, x, y, w, h, r); ctx.clip() }
+const rrStroke = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => { rrPath(ctx, x, y, w, h, r); ctx.stroke() }
 
 function loadImg(src: string): Promise<HTMLImageElement> {
   return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src })
