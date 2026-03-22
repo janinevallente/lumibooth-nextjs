@@ -137,44 +137,204 @@ const STICKER_EMOJIS = [
   '💎', '🌈', '🧸', '🎁',
 ]
 
-// ─── Sticker drag overlay ────────────────────────────────────────────────────
+// ─── Sticker overlay — drag / resize / rotate / remove ────────────────────────
+//
+// Controls shown when a sticker is selected:
+//   ✕  top-right    → remove
+//   ↺  top-left     → rotate  (drag around sticker center)
+//   ⤡  bottom-right → resize  (drag left/right)
+//
+// Drag the sticker body to reposition.
+// Double-tap removes (mobile fallback).
 
-function StickerOverlay({ stickers, onMove, onRemove }: {
+function StickerOverlay({ stickers, onMove, onRemove, onResize, onRotate }: {
   stickers: Sticker[]
   onMove: (id: string, x: number, y: number) => void
   onRemove: (id: string) => void
+  onResize: (id: string, size: number) => void
+  onRotate: (id: string, rotation: number) => void
 }) {
   const ref = useRef<HTMLDivElement>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
-  const handlePointerDown = (e: React.PointerEvent, s: Sticker) => {
+  // ── Drag body ─────────────────────────────────────────────────────────────
+  const handleDragPointerDown = (e: React.PointerEvent, s: Sticker) => {
+    const role = (e.target as HTMLElement).dataset.role
+    if (role === 'resize-handle' || role === 'rotate-handle' || role === 'remove-btn') return
     e.preventDefault()
+    e.stopPropagation()
+    setSelectedId(s.id)
       ; (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+
     const move = (ev: PointerEvent) => {
       const r = ref.current?.getBoundingClientRect()
       if (!r) return
-      onMove(s.id,
+      onMove(
+        s.id,
         Math.max(0, Math.min(100, ((ev.clientX - r.left) / r.width) * 100)),
         Math.max(0, Math.min(100, ((ev.clientY - r.top) / r.height) * 100)),
       )
     }
-    const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up) }
+    const up = () => {
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+    }
     window.addEventListener('pointermove', move)
     window.addEventListener('pointerup', up)
   }
 
+  // ── Resize handle (bottom-right) ─────────────────────────────────────────
+  const handleResizePointerDown = (e: React.PointerEvent, s: Sticker) => {
+    e.preventDefault()
+    e.stopPropagation()
+      ; (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+
+    const startX = e.clientX
+    const startSize = s.size as number
+
+    const move = (ev: PointerEvent) => {
+      const delta = ev.clientX - startX
+      onResize(s.id, Math.max(16, Math.min(80, startSize + delta * 0.6)))
+    }
+    const up = () => {
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+    }
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
+  }
+
+  // ── Rotate handle (top-left) ──────────────────────────────────────────────
+  // Computes angle from sticker center to pointer; delta from drag-start angle
+  // is added to the sticker's rotation at drag start.
+  const handleRotatePointerDown = (e: React.PointerEvent, s: Sticker) => {
+    e.preventDefault()
+    e.stopPropagation()
+      ; (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+
+    const r = ref.current?.getBoundingClientRect()
+    if (!r) return
+
+    // Sticker center in viewport coords
+    const cx = r.left + (s.x / 100) * r.width
+    const cy = r.top + (s.y / 100) * r.height
+
+    const startAngle = Math.atan2(e.clientY - cy, e.clientX - cx) * (180 / Math.PI)
+    const startRotation = s.rotation
+
+    const move = (ev: PointerEvent) => {
+      const currentAngle = Math.atan2(ev.clientY - cy, ev.clientX - cx) * (180 / Math.PI)
+      onRotate(s.id, startRotation + (currentAngle - startAngle))
+    }
+    const up = () => {
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+    }
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
+  }
+
+  // ── Deselect on overlay background click ─────────────────────────────────
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement) === ref.current) setSelectedId(null)
+  }
+
   return (
-    <div ref={ref} className="absolute inset-0" style={{ touchAction: 'none' }}>
-      {stickers.map(s => (
-        <div key={s.id} onPointerDown={e => handlePointerDown(e, s)} onDoubleClick={() => onRemove(s.id)}
-          style={{
-            position: 'absolute', left: `${s.x}%`, top: `${s.y}%`,
-            fontSize: s.size, transform: `translate(-50%,-50%) rotate(${s.rotation}deg)`,
-            cursor: 'grab', userSelect: 'none',
-            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.18))',
-          }}>
-          {s.emoji}
-        </div>
-      ))}
+    <div
+      ref={ref}
+      className="absolute inset-0"
+      style={{ touchAction: 'none' }}
+      onClick={handleOverlayClick}
+    >
+      {stickers.map(s => {
+        const isSelected = selectedId === s.id
+        const sz = s.size as number
+
+        return (
+          <div
+            key={s.id}
+            onPointerDown={e => handleDragPointerDown(e, s)}
+            onDoubleClick={() => { onRemove(s.id); setSelectedId(null) }}
+            style={{
+              position: 'absolute',
+              left: `${s.x}%`,
+              top: `${s.y}%`,
+              transform: `translate(-50%, -50%) rotate(${s.rotation}deg)`,
+              cursor: 'grab',
+              userSelect: 'none',
+              outline: isSelected ? '2px dashed rgba(212,104,122,0.8)' : 'none',
+              outlineOffset: 6,
+              borderRadius: 4,
+              zIndex: isSelected ? 20 : 10,
+            }}
+          >
+            {/* Emoji */}
+            <span style={{
+              fontSize: sz,
+              display: 'block',
+              lineHeight: 1,
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.18))',
+              transition: 'font-size 0.05s linear',
+            }}>
+              {s.emoji}
+            </span>
+
+            {isSelected && (
+              <>
+                {/* ✕ Remove — top-right */}
+                <button
+                  data-role="remove-btn"
+                  onPointerDown={e => e.stopPropagation()}
+                  onClick={e => { e.stopPropagation(); onRemove(s.id); setSelectedId(null) }}
+                  style={{
+                    position: 'absolute', top: -12, right: -12,
+                    width: 20, height: 20, borderRadius: '50%',
+                    background: '#E11D48', border: '1.5px solid white',
+                    color: 'white', fontSize: 10, fontWeight: 700,
+                    cursor: 'pointer', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center',
+                    zIndex: 30, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', padding: 0,
+                  }}
+                >✕</button>
+
+                {/* ↺ Rotate — top-left */}
+                <div
+                  data-role="rotate-handle"
+                  onPointerDown={e => handleRotatePointerDown(e, s)}
+                  title="Drag to rotate"
+                  style={{
+                    position: 'absolute', top: -12, left: -12,
+                    width: 20, height: 20, borderRadius: '50%',
+                    background: 'white', border: '1.5px solid rgba(107,72,255,0.7)',
+                    cursor: 'grab', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center',
+                    zIndex: 30, boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+                    fontSize: 12, color: 'rgba(107,72,255,0.9)',
+                    touchAction: 'none',
+                  }}
+                >↺</div>
+
+                {/* ⤡ Resize — bottom-right */}
+                <div
+                  data-role="resize-handle"
+                  onPointerDown={e => handleResizePointerDown(e, s)}
+                  title="Drag to resize"
+                  style={{
+                    position: 'absolute', bottom: -12, right: -12,
+                    width: 20, height: 20, borderRadius: '50%',
+                    background: 'white', border: '1.5px solid rgba(212,104,122,0.8)',
+                    cursor: 'ew-resize', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center',
+                    zIndex: 30, boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+                    fontSize: 10, color: 'rgba(212,104,122,0.9)',
+                    touchAction: 'none',
+                  }}
+                >⤡</div>
+              </>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -254,10 +414,24 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
   }
 
   const moveSticker = (idx: number, id: string, x: number, y: number) =>
-    setPhotos(prev => prev.map((p, i) => i === idx ? { ...p, stickers: p.stickers.map(s => s.id === id ? { ...s, x, y } : s) } : p))
+    setPhotos(prev => prev.map((p, i) => i === idx
+      ? { ...p, stickers: p.stickers.map(s => s.id === id ? { ...s, x, y } : s) }
+      : p))
 
   const removeSticker = (idx: number, id: string) =>
-    setPhotos(prev => prev.map((p, i) => i === idx ? { ...p, stickers: p.stickers.filter(s => s.id !== id) } : p))
+    setPhotos(prev => prev.map((p, i) => i === idx
+      ? { ...p, stickers: p.stickers.filter(s => s.id !== id) }
+      : p))
+
+  const resizeSticker = (idx: number, id: string, size: number) =>
+    setPhotos(prev => prev.map((p, i) => i === idx
+      ? { ...p, stickers: p.stickers.map(s => s.id === id ? { ...s, size } : s) }
+      : p))
+
+  const rotateSticker = (idx: number, id: string, rotation: number) =>
+    setPhotos(prev => prev.map((p, i) => i === idx
+      ? { ...p, stickers: p.stickers.map(s => s.id === id ? { ...s, rotation } : s) }
+      : p))
 
   const getFilterCss = (f: FilterId) => FILTERS.find(x => x.id === f)?.css ?? 'none'
 
@@ -277,16 +451,13 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
       c = document.createElement('canvas'); c.width = totalW; c.height = totalH
       ctx = c.getContext('2d')!
 
-      // BG
       const bg = ctx.createLinearGradient(0, 0, totalW, totalH)
       bg.addColorStop(0, theme.bg[0]); bg.addColorStop(1, theme.bg[1])
       ctx.fillStyle = bg; ctx.fillRect(0, 0, totalW, totalH)
 
-      // Dots
       ctx.fillStyle = 'rgba(212,104,122,0.12)'
       for (let dx = 20; dx < totalW; dx += 30) for (let dy = 20; dy < totalH; dy += 30) { ctx.beginPath(); ctx.arc(dx, dy, 2, 0, Math.PI * 2); ctx.fill() }
 
-      // Header
       const hg = ctx.createLinearGradient(0, 0, totalW, HEADER_H)
       const [hc1, hc2] = theme.headerBg.includes('#') ? theme.headerBg.match(/#[0-9a-f]{6}/gi)! : ['#D4687A', '#EBA8B4']
       hg.addColorStop(0, hc1); hg.addColorStop(1, hc2)
@@ -295,7 +466,6 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
       ctx.fillText('LumiBooth', totalW / 2, 56)
       ctx.font = '13px sans-serif'; ctx.fillStyle = headerSubTextColor
 
-      // Photos 2x2
       const positions = [
         [PAD, HEADER_H + PAD], [PW + PAD * 2, HEADER_H + PAD],
         [PAD, HEADER_H + PAD + PH + GAP], [PW + PAD * 2, HEADER_H + PAD + PH + GAP],
@@ -314,7 +484,6 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
         }
       }
 
-      // Footer
       const fy = totalH - FOOTER_H
       const fg = ctx.createLinearGradient(0, fy, totalW, totalH)
       const [fc1, fc2] = theme.footerBg.includes('#') ? theme.footerBg.match(/#[0-9a-f]{6}/gi)! : ['#EBA8B4', '#C4B5D4']
@@ -325,7 +494,6 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
       ctx.font = '12px sans-serif'; ctx.fillStyle = footerSubTextColor
       ctx.fillText(new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }).replace(/\//g, '.'), totalW / 2, fy + 50)
     } else {
-      // vertical strip
       const stripW = PW + PAD * 2
       const n = photos.length
       const stripH = HEADER_H + PAD + (PH + GAP) * n - GAP + PAD + FOOTER_H
@@ -390,12 +558,11 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
 
   const isGrid = stripType === 'grid2x2'
 
-  // Aspect ratio per strip type for the photo preview slots
   const photoAspect: Record<string, string> = {
-    single: '4/5',   // tall portrait — big single photo
-    strip3: '3/2',   // slightly narrower landscape, 3-tall strip
-    strip4: '3/2',   // same as strip3 — classic narrow booth strip
-    grid2x2: '4/3',   // square-ish grid cells
+    single: '4/5',
+    strip3: '3/2',
+    strip4: '3/2',
+    grid2x2: '4/3',
   }
   const slotAspect = photoAspect[stripType] ?? '4/3'
 
@@ -429,9 +596,8 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
 
       {/* Content */}
       <div className="flex flex-col lg:flex-row gap-5 px-4 sm:px-6 pb-10 max-w-[1200px] mx-auto w-full">
-        {/* Left: strip preview (large) */}
+        {/* Left: strip preview */}
         <div className="flex-1 flex flex-col gap-4">
-          {/* Strip preview */}
           <div className="card p-4 anim-scale" style={{ animationDelay: '0.15s' }}>
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--muted)' }}>Your Strip</p>
@@ -439,9 +605,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
             </div>
 
             {isGrid ? (
-              /* 2x2 grid layout */
               <div className="overflow-hidden rounded-2xl" style={{ border: '1px solid rgba(212,104,122,0.15)', background: theme.bg[0] }}>
-                {/* Mini header */}
                 <div className="flex flex-col items-center justify-center py-2.5 gap-0.5" style={{ background: theme.headerBg }}>
                   <span className="text-[23px] font-serif font-bold text-base tracking-wide" style={{ color: stripLabelColor }}>LumiBooth</span>
                 </div>
@@ -455,9 +619,13 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                         boxShadow: selectedPhoto === i ? '0 0 0 3px rgba(212,104,122,0.2)' : '0 2px 8px rgba(30,34,53,0.1)',
                       }}>
                       <img src={p.dataUrl} className="w-full h-full object-cover" alt="" style={{ filter: getFilterCss(p.filter) }} />
-                      <StickerOverlay stickers={p.stickers}
+                      <StickerOverlay
+                        stickers={p.stickers}
                         onMove={(id, x, y) => moveSticker(i, id, x, y)}
-                        onRemove={(id) => removeSticker(i, id)} />
+                        onRemove={(id) => removeSticker(i, id)}
+                        onResize={(id, size) => resizeSticker(i, id, size)}
+                        onRotate={(id, rotation) => rotateSticker(i, id, rotation)}
+                      />
                       {selectedPhoto === i && (
                         <div className="absolute top-1.5 left-1.5 w-4 h-4 rounded-full flex items-center justify-center"
                           style={{ background: 'var(--rose)' }}>
@@ -479,7 +647,6 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                 </div>
               </div>
             ) : (
-              /* Vertical strip layout */
               <div className="flex gap-4">
                 <div className="overflow-hidden rounded-2xl mx-auto"
                   style={{
@@ -502,9 +669,13 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                           boxShadow: selectedPhoto === i ? '0 0 0 3px rgba(212,104,122,0.2)' : '0 2px 8px rgba(30,34,53,0.1)',
                         }}>
                         <img src={p.dataUrl} className="w-full h-full object-cover" alt="" style={{ filter: getFilterCss(p.filter) }} />
-                        <StickerOverlay stickers={p.stickers}
+                        <StickerOverlay
+                          stickers={p.stickers}
                           onMove={(id, x, y) => moveSticker(i, id, x, y)}
-                          onRemove={(id) => removeSticker(i, id)} />
+                          onRemove={(id) => removeSticker(i, id)}
+                          onResize={(id, size) => resizeSticker(i, id, size)}
+                          onRotate={(id, rotation) => rotateSticker(i, id, rotation)}
+                        />
                         {selectedPhoto === i && (
                           <div className="absolute top-1.5 left-1.5 w-4 h-4 rounded-full flex items-center justify-center"
                             style={{ background: 'var(--rose)' }}>
@@ -532,7 +703,6 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
               </div>
             )}
           </div>
-
         </div>
 
         {/* Right: sticker panel + actions */}
@@ -545,7 +715,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
               <span className="text-[10px]" style={{ color: 'var(--muted)' }}>Adding to photo {selectedPhoto + 1}</span>
             </div>
             <p className="text-[10px] mb-3" style={{ color: 'var(--muted)' }}>
-              Drag to reposition · Double-tap to remove
+              Tap to select · Drag to move · ↺ rotate · ⤡ resize · ✕ remove
             </p>
             <div className="grid grid-cols-7 gap-1">
               {STICKER_EMOJIS.map(emoji => (
@@ -558,7 +728,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
             </div>
           </div>
 
-          {/* Theme picker — vertical carousel, 3 visible at a time */}
+          {/* Theme picker */}
           <div className="card p-4 anim-fade" style={{ animationDelay: '0.25s' }}>
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--muted)' }}>Strip Theme</p>
@@ -567,7 +737,6 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
               </span>
             </div>
             <div className="relative">
-              {/* Up arrow */}
               <button
                 className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-6 h-5 flex items-center justify-center text-xs font-bold z-10 rounded-full"
                 style={{ background: 'white', border: '1px solid rgba(212,104,122,0.25)', boxShadow: '0 2px 6px rgba(30,34,53,0.1)', color: 'var(--rose)' }}
@@ -577,18 +746,11 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                 }}
               >︿</button>
 
-              {/* Scroll track — shows 3 rows, each row = 3 themes side by side */}
               <div
                 id="theme-carousel-v"
                 className="overflow-y-auto"
-                style={{
-                  maxHeight: 240,
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  scrollBehavior: 'smooth',
-                }}
+                style={{ maxHeight: 240, scrollbarWidth: 'none', msOverflowStyle: 'none', scrollBehavior: 'smooth' }}
               >
-                {/* Group themes into rows of 3 */}
                 {Array.from({ length: Math.ceil(THEMES.length / 3) }, (_, rowIdx) => (
                   <div key={rowIdx} className="grid grid-cols-3 gap-2 mb-2">
                     {THEMES.slice(rowIdx * 3, rowIdx * 3 + 3).map(t => (
@@ -607,7 +769,6 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                 ))}
               </div>
 
-              {/* Down arrow */}
               <button
                 className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full w-6 h-5 flex items-center justify-center text-xs font-bold z-10 rounded-full"
                 style={{ background: 'white', border: '1px solid rgba(212,104,122,0.25)', boxShadow: '0 2px 6px rgba(30,34,53,0.1)', color: 'var(--rose)' }}
@@ -617,7 +778,6 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                 }}
               >﹀</button>
             </div>
-            {/* Selected label */}
             <p className="text-[10px] text-center mt-3 font-medium" style={{ color: 'var(--rose)' }}>
               {THEMES.find(t => t.id === selectedTheme)?.label}
             </p>
