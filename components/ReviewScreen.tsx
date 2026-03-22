@@ -53,6 +53,87 @@ const THEMES: Theme[] = [
     borderColor: 'rgba(201,169,110,0.4)',
     textColor: '#A07840',
   },
+  {
+    id: 'aurora',
+    label: 'Aurora',
+    headerBg: 'linear-gradient(135deg, #6B48FF, #A78BFA)',
+    footerBg: 'linear-gradient(135deg, #A78BFA, #F0ABFC)',
+    bg: ['#F5F0FF', '#EEF0FF'],
+    borderColor: 'rgba(107,72,255,0.35)',
+    textColor: '#6B48FF',
+  },
+  {
+    id: 'peach',
+    label: 'Peach',
+    headerBg: 'linear-gradient(135deg, #F97316, #FDBA74)',
+    footerBg: 'linear-gradient(135deg, #FDBA74, #FDE68A)',
+    bg: ['#FFF7ED', '#FFF3E0'],
+    borderColor: 'rgba(249,115,22,0.35)',
+    textColor: '#C2410C',
+  },
+  {
+    id: 'ocean',
+    label: 'Ocean',
+    headerBg: 'linear-gradient(135deg, #0369A1, #38BDF8)',
+    footerBg: 'linear-gradient(135deg, #38BDF8, #7DD3FC)',
+    bg: ['#F0F9FF', '#E0F4FF'],
+    borderColor: 'rgba(3,105,161,0.35)',
+    textColor: '#0369A1',
+  },
+  {
+    id: 'noir',
+    label: 'Noir',
+    headerBg: 'linear-gradient(135deg, #18181B, #3F3F46)',
+    footerBg: 'linear-gradient(135deg, #3F3F46, #52525B)',
+    bg: ['#FAFAFA', '#F4F4F5'],
+    borderColor: 'rgba(24,24,27,0.4)',
+    textColor: '#18181B',
+  },
+  {
+    id: 'cherry',
+    label: 'Cherry',
+    headerBg: 'linear-gradient(135deg, #9F1239, #E11D48)',
+    footerBg: 'linear-gradient(135deg, #E11D48, #FB7185)',
+    bg: ['#FFF1F2', '#FFE4E6'],
+    borderColor: 'rgba(159,18,57,0.35)',
+    textColor: '#9F1239',
+  },
+  {
+    id: 'matcha',
+    label: 'Matcha',
+    headerBg: 'linear-gradient(135deg, #3D6B4F, #6B9E7A)',
+    footerBg: 'linear-gradient(135deg, #6B9E7A, #A3C4A8)',
+    bg: ['#F0F7F2', '#E8F2EB'],
+    borderColor: 'rgba(61,107,79,0.35)',
+    textColor: '#3D6B4F',
+  },
+  {
+    id: 'lavender',
+    label: 'Lavender',
+    headerBg: 'linear-gradient(135deg, #7C3AED, #A78BFA)',
+    footerBg: 'linear-gradient(135deg, #C4B5FD, #DDD6FE)',
+    bg: ['#F5F3FF', '#EDE9FE'],
+    borderColor: 'rgba(124,58,237,0.3)',
+    textColor: '#7C3AED',
+  },
+  {
+    id: 'sunset',
+    label: 'Sunset',
+    headerBg: 'linear-gradient(135deg, #DC2626, #F97316, #FBBF24)',
+    footerBg: 'linear-gradient(135deg, #FBBF24, #FDE68A)',
+    bg: ['#FFFBEB', '#FFF7ED'],
+    borderColor: 'rgba(220,38,38,0.3)',
+    textColor: '#B45309',
+  },
+  {
+    id: 'white',
+    label: 'White',
+    headerBg: 'linear-gradient(135deg, #FFFFFF, #F5F5F5)',
+    footerBg: 'linear-gradient(135deg, #F5F5F5, #ECECEC)',
+    bg: ['#FFFFFF', '#FAFAFA'],
+    borderColor: 'rgba(0,0,0,0.1)',
+    textColor: '#374151',
+  },
 ]
 
 // ─── Sticker emojis ───────────────────────────────────────────────────────────
@@ -328,24 +409,24 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
             <div key={i} className={`step-dot ${i === 3 ? 'active' : 'done'}`} />
           ))}
         </div>
-        <button className="btn btn-primary px-5 py-2.5 text-sm" onClick={downloadStrip} disabled={downloading}>
-          {downloading ? <span className="spin-anim inline-block">✨</span> : '💾'} Save
-        </button>
+        <div className="w-20" />
+      </div>
+
+      {/* Step 3 of 3 */}
+      <div className="flex flex-col lg:flex-row gap-5 px-4 sm:px-6 pb-3 max-w-[1200px] mx-auto w-full">
+        <div className="anim-fade" style={{ animationDelay: '0.1s' }}>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] mb-0.5" style={{ color: 'var(--rose)' }}>Step 3 of 3</p>
+          <h2 className="font-serif" style={{ fontSize: 'clamp(26px,4vw,40px)', fontWeight: 300, color: 'var(--navy)', lineHeight: 1.1 }}>
+            Design your <em style={{ color: 'var(--rose)' }}>strip</em>
+          </h2>
+          <p className="text-sm mt-1" style={{ color: 'var(--muted)' }}>Pick a theme, drag stickers, then save.</p>
+        </div>
       </div>
 
       {/* Content */}
       <div className="flex flex-col lg:flex-row gap-5 px-4 sm:px-6 pb-10 max-w-[1200px] mx-auto w-full">
-
         {/* Left: strip preview (large) */}
         <div className="flex-1 flex flex-col gap-4">
-          <div className="anim-fade" style={{ animationDelay: '0.1s' }}>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] mb-0.5" style={{ color: 'var(--rose)' }}>Step 3 of 3</p>
-            <h2 className="font-serif" style={{ fontSize: 'clamp(26px,4vw,40px)', fontWeight: 300, color: 'var(--navy)', lineHeight: 1.1 }}>
-              Design your <em style={{ color: 'var(--rose)' }}>strip</em>
-            </h2>
-            <p className="text-sm mt-1" style={{ color: 'var(--muted)' }}>Pick a theme, drag stickers, then save.</p>
-          </div>
-
           {/* Strip preview */}
           <div className="card p-4 anim-scale" style={{ animationDelay: '0.15s' }}>
             <div className="flex items-center justify-between mb-3">
