@@ -22,7 +22,7 @@ function StripPreview({ type }: { type: StripType }) {
 
   if (type === 'single') return (
     <div className="flex items-center justify-center" style={{ height: 100 }}>
-      {slot(90, 68)}
+      {slot(90, 100)}
     </div>
   )
 

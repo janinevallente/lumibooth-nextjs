@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import { PhotoEntry, Sticker, FILTERS, FilterId } from './CameraScreen'
 import { StripType } from './StripSelector'
 
@@ -404,7 +404,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
 
   // Aspect ratio per strip type for the photo preview slots
   const photoAspect: Record<string, string> = {
-    single: '4/3',   // landscape, single full photo
+    single: '4/5',   // tall portrait — big single photo
     strip3: '3/2',   // slightly narrower landscape, 3-tall strip
     strip4: '3/2',   // same as strip3 — classic narrow booth strip
     grid2x2: '4/3',   // square-ish grid cells
@@ -490,8 +490,13 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
             ) : (
               /* Vertical strip layout */
               <div className="flex gap-4">
-                <div className="overflow-hidden rounded-2xl flex-1 max-w-xs mx-auto"
-                  style={{ border: '1px solid rgba(212,104,122,0.15)', background: theme.bg[0] }}>
+                <div className="overflow-hidden rounded-2xl mx-auto"
+                  style={{
+                    border: '1px solid rgba(212,104,122,0.15)',
+                    background: theme.bg[0],
+                    width: '100%',
+                    maxWidth: stripType === 'single' ? 420 : 320,
+                  }}>
                   <div className="flex items-center justify-center py-3" style={{ background: theme.headerBg }}>
                     <span className="text-sm font-semibold tracking-wide" style={{ color: stripLabelColor }}>LumiBooth 🌸</span>
                   </div>
@@ -501,6 +506,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                         className="relative overflow-hidden rounded-xl cursor-pointer transition-all"
                         style={{
                           aspectRatio: slotAspect,
+                          ...(stripType === 'single' ? { minHeight: 300 } : {}),
                           border: selectedPhoto === i ? `2px solid var(--rose)` : '2px solid transparent',
                           boxShadow: selectedPhoto === i ? '0 0 0 3px rgba(212,104,122,0.2)' : '0 2px 8px rgba(30,34,53,0.1)',
                         }}>

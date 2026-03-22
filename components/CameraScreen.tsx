@@ -160,7 +160,7 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
 
   // Per-strip aspect ratio for preview slots
   const photoAspect: Record<StripType, string> = {
-    single: '4/3',
+    single: '4/4',
     strip3: '3/2',
     strip4: '3/2',
     grid2x2: '4/3',
@@ -201,7 +201,7 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
         </button>
       </div>
 
-      <div className="flex flex-col gap-4 px-4 sm:px-6 pb-8 flex-1 max-w-[1025px] mx-auto w-full">
+      <div className="flex flex-col gap-4 px-4 sm:px-6 pb-8 flex-1 max-w-[1110px] mx-auto w-full">
         {/* Status bar */}
         <div className="anim-fade" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center justify-between">
@@ -321,7 +321,7 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
           </div>
 
           {/* Right col: filter (desktop) + strip preview */}
-          <div className="lg:w-72 flex flex-col gap-4">
+          <div className={`flex flex-col gap-4 ${stripType === 'single' ? 'lg:w-96' : 'lg:w-72'}`}>
 
             {/* Filter — desktop only (inline with viewport, hidden on mobile) */}
             <div className="hidden lg:block card p-4 anim-fade" style={{ animationDelay: '0.2s' }}>
@@ -360,19 +360,26 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
                 <div className="flex flex-col gap-2">
                   {Array.from({ length: needed }).map((_, i) => (
                     <div key={i} className="relative overflow-hidden rounded-xl"
-                      style={{ aspectRatio: slotAspect, background: 'linear-gradient(135deg,#F5D5DB22,#C4B5D418)', border: '1.5px dashed rgba(212,104,122,0.25)' }}>
+                      style={{
+                        aspectRatio: slotAspect,
+                        ...(stripType === 'single' ? { width: '100%', minHeight: 300 } : {}),
+                        background: 'linear-gradient(135deg,#F5D5DB22,#C4B5D418)',
+                        border: '1.5px dashed rgba(212,104,122,0.25)',
+                      }}>
                       {photos[i] ? (
                         <img src={photos[i].dataUrl} className="w-full h-full object-cover anim-pop"
                           style={{ animationDelay: `${i * 0.06}s`, opacity: 0, animationFillMode: 'forwards' }} alt="" />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span style={{ fontSize: 16, opacity: 0.2 }}>🌸</span>
+                          <span style={{ fontSize: stripType === 'single' ? 48 : 16, opacity: 0.2 }}>🌸</span>
                         </div>
                       )}
-                      <div className="absolute bottom-1 right-1.5 font-serif text-[10px]"
-                        style={{ color: photos[i] ? 'rgba(255,255,255,0.6)' : 'rgba(180,160,190,0.5)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-                        {i + 1}
-                      </div>
+                      {stripType !== 'single' && (
+                        <div className="absolute bottom-1 right-1.5 font-serif text-[10px]"
+                          style={{ color: photos[i] ? 'rgba(255,255,255,0.6)' : 'rgba(180,160,190,0.5)', textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+                          {i + 1}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
