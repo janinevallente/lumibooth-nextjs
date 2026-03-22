@@ -10,7 +10,7 @@ type Step = 'landing' | 'strip-select' | 'camera' | 'review'
 
 export default function Home() {
   const [step, setStep] = useState<Step>('landing')
-  const [stripType, setStripType] = useState<StripType | null>(null)
+  const [stripType, setStripType] = useState<StripType | null>('strip4')
   const [photos, setPhotos] = useState<PhotoEntry[]>([])
 
   const handlePhotosComplete = (captured: PhotoEntry[]) => {
