@@ -108,15 +108,6 @@ const THEMES: Theme[] = [
     textColor: '#3D6B4F',
   },
   {
-    id: 'lavender',
-    label: 'Lavender',
-    headerBg: 'linear-gradient(135deg, #7C3AED, #A78BFA)',
-    footerBg: 'linear-gradient(135deg, #C4B5FD, #DDD6FE)',
-    bg: ['#F5F3FF', '#EDE9FE'],
-    borderColor: 'rgba(124,58,237,0.3)',
-    textColor: '#7C3AED',
-  },
-  {
     id: 'sunset',
     label: 'Sunset',
     headerBg: 'linear-gradient(135deg, #DC2626, #F97316, #FBBF24)',
@@ -303,7 +294,6 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
       ctx.fillStyle = headerTextColor; ctx.font = 'bold 38px serif'; ctx.textAlign = 'center'
       ctx.fillText('LumiBooth', totalW / 2, 56)
       ctx.font = '13px sans-serif'; ctx.fillStyle = headerSubTextColor
-      ctx.fillText('Capture your glowing moments', totalW / 2, 78)
 
       // Photos 2x2
       const positions = [
@@ -331,10 +321,9 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
       fg.addColorStop(0, fc1); fg.addColorStop(1, fc2)
       ctx.fillStyle = fg; ctx.fillRect(0, fy, totalW, FOOTER_H)
       ctx.fillStyle = footerTextColor; ctx.font = '500 15px sans-serif'; ctx.textAlign = 'center'
-      ctx.fillText(new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }), totalW / 2, fy + 30)
+      ctx.fillText("Capture your glowing moments 🌸", totalW / 2, fy + 30)
       ctx.font = '12px sans-serif'; ctx.fillStyle = footerSubTextColor
-      ctx.fillText('🌸 A photo from LumiBooth', totalW / 2, fy + 50)
-
+      ctx.fillText(new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }).replace(/\//g, '.'), totalW / 2, fy + 50)
     } else {
       // vertical strip
       const stripW = PW + PAD * 2
@@ -357,7 +346,6 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
       ctx.fillStyle = headerTextColor; ctx.font = 'bold 38px serif'; ctx.textAlign = 'center'
       ctx.fillText('LumiBooth', stripW / 2, 56)
       ctx.font = '13px sans-serif'; ctx.fillStyle = headerSubTextColor
-      ctx.fillText('Capture your glowing moments', stripW / 2, 78)
 
       for (let i = 0; i < photos.length; i++) {
         const py = HEADER_H + PAD + i * (PH + GAP), px = PAD
@@ -379,9 +367,9 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
       fg2.addColorStop(0, fc12); fg2.addColorStop(1, fc22)
       ctx.fillStyle = fg2; ctx.fillRect(0, fy2, stripW, FOOTER_H)
       ctx.fillStyle = footerTextColor; ctx.font = '500 15px sans-serif'; ctx.textAlign = 'center'
-      ctx.fillText(new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }), stripW / 2, fy2 + 30)
+      ctx.fillText("Capture your glowing moments 🌸", stripW / 2, fy2 + 30)
       ctx.font = '12px sans-serif'; ctx.fillStyle = footerSubTextColor
-      ctx.fillText('🌸 A photo from LumiBooth', stripW / 2, fy2 + 50)
+      ctx.fillText(new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }).replace(/\//g, '.'), stripW / 2, fy2 + 50)
     }
 
     return c
@@ -454,8 +442,8 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
               /* 2x2 grid layout */
               <div className="overflow-hidden rounded-2xl" style={{ border: '1px solid rgba(212,104,122,0.15)', background: theme.bg[0] }}>
                 {/* Mini header */}
-                <div className="flex items-center justify-center py-2" style={{ background: theme.headerBg }}>
-                  <span className="text-xs font-semibold tracking-wider" style={{ color: stripLabelColor }}>LumiBooth 🌸</span>
+                <div className="flex flex-col items-center justify-center py-2.5 gap-0.5" style={{ background: theme.headerBg }}>
+                  <span className="text-[23px] font-serif font-bold text-base tracking-wide" style={{ color: stripLabelColor }}>LumiBooth</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 p-3">
                   {photos.map((p, i) => (
@@ -481,9 +469,12 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                     </div>
                   ))}
                 </div>
-                <div className="flex items-center justify-center py-1.5" style={{ background: theme.footerBg }}>
-                  <span className="text-[10px]" style={{ color: stripLabelColor, opacity: 0.8 }}>
-                    {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                <div className="flex flex-col items-center justify-center py-2 gap-0.5" style={{ background: theme.footerBg }}>
+                  <span className="text-[11px] font-medium" style={{ color: stripLabelColor, opacity: 0.9 }}>
+                    Capture your glowing moments 🌸
+                  </span>
+                  <span className="text-[9px]" style={{ color: stripLabelColor, opacity: 0.55 }}>
+                    {new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }).replace(/\//g, '.')}
                   </span>
                 </div>
               </div>
@@ -495,18 +486,18 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                     border: '1px solid rgba(212,104,122,0.15)',
                     background: theme.bg[0],
                     width: '100%',
-                    maxWidth: stripType === 'single' ? 420 : 320,
+                    maxWidth: stripType === 'single' ? '100%' : 320,
                   }}>
-                  <div className="flex items-center justify-center py-3" style={{ background: theme.headerBg }}>
-                    <span className="text-sm font-semibold tracking-wide" style={{ color: stripLabelColor }}>LumiBooth 🌸</span>
+                  <div className="flex flex-col items-center justify-center py-2.5 gap-0.5" style={{ background: theme.headerBg }}>
+                    <span className="text-[23px] font-serif font-bold text-base tracking-wide" style={{ color: stripLabelColor }}>LumiBooth</span>
                   </div>
                   <div className="flex flex-col gap-2 p-3">
                     {photos.map((p, i) => (
                       <div key={i} onClick={() => setSelectedPhoto(i)}
                         className="relative overflow-hidden rounded-xl cursor-pointer transition-all"
                         style={{
-                          aspectRatio: slotAspect,
-                          ...(stripType === 'single' ? { minHeight: 300 } : {}),
+                          aspectRatio: stripType === 'single' ? '16/9' : slotAspect,
+                          width: '100%',
                           border: selectedPhoto === i ? `2px solid var(--rose)` : '2px solid transparent',
                           boxShadow: selectedPhoto === i ? '0 0 0 3px rgba(212,104,122,0.2)' : '0 2px 8px rgba(30,34,53,0.1)',
                         }}>
@@ -529,9 +520,12 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                       </div>
                     ))}
                   </div>
-                  <div className="flex items-center justify-center py-2" style={{ background: theme.footerBg }}>
-                    <span className="text-[10px]" style={{ color: stripLabelColor, opacity: 0.75 }}>
-                      {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · LumiBooth
+                  <div className="flex flex-col items-center justify-center py-2 gap-0.5" style={{ background: theme.footerBg }}>
+                    <span className="text-[11px] font-medium" style={{ color: stripLabelColor, opacity: 0.9 }}>
+                      Capture your glowing moments 🌸
+                    </span>
+                    <span className="text-[9px]" style={{ color: stripLabelColor, opacity: 0.55 }}>
+                      {new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }).replace(/\//g, '.')}
                     </span>
                   </div>
                 </div>
@@ -630,11 +624,11 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
           </div>
 
           {/* Actions */}
-          <div className="p-4 flex flex-col md:flex-row gap-3 anim-fade" style={{ animationDelay: '0.3s' }}>
-            <button className="btn btn-outline w-full py-3 text-sm" onClick={onRetake}>
+          <div className="card p-4 flex flex-row gap-3 anim-fade" style={{ animationDelay: '0.3s' }}>
+            <button className="btn btn-outline flex-1 py-3.5 text-sm" onClick={onRetake}>
               🔄 Retake
             </button>
-            <button className="btn btn-primary w-full py-3 text-sm" onClick={downloadStrip} disabled={downloading}>
+            <button className="btn btn-primary flex-1 py-3.5 text-sm" onClick={downloadStrip} disabled={downloading}>
               {downloading ? <><span className="spin-anim inline-block">✨</span> Saving…</> : <>💾 Download</>}
             </button>
           </div>
