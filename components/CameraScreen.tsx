@@ -181,7 +181,7 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
 
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 sm:px-8 py-5 anim-fade">
-        <button className="btn btn-ghost px-4 text-sm" onClick={onBack}>← Back</button>
+        <button className="btn btn-ghost px-4 py-2 text-sm" onClick={onBack}>← Back</button>
         <div className="step-bar">
           {[0, 1, 2, 3].map(i => (
             <div key={i} className={`step-dot ${i === 2 ? 'active' : i < 2 ? 'done' : ''}`} />
