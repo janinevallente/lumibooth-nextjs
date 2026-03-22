@@ -161,8 +161,8 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
   // Per-strip aspect ratio for preview slots
   const photoAspect: Record<StripType, string> = {
     single: '4/4',
-    strip3: '3/2',
-    strip4: '3/2',
+    strip3: '2/2',
+    strip4: '2/2',
     grid2x2: '4/3',
   }
   const slotAspect = photoAspect[stripType]

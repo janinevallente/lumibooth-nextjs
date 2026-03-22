@@ -79,31 +79,19 @@ function StickerOverlay({ stickers, onMove, onRemove, onResize, onRotate }: {
         Math.max(0, Math.min(100, ((ev.clientY - r.top) / r.height) * 100)),
       )
     }
-    const up = () => {
-      window.removeEventListener('pointermove', move)
-      window.removeEventListener('pointerup', up)
-    }
+    const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up) }
     window.addEventListener('pointermove', move)
     window.addEventListener('pointerup', up)
   }
 
-  // ── Resize handle (bottom-right) ─────────────────────────────────────────
   const handleResizePointerDown = (e: React.PointerEvent, s: Sticker) => {
     e.preventDefault()
     e.stopPropagation()
       ; (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
-
     const startX = e.clientX
     const startSize = s.size as number
-
-    const move = (ev: PointerEvent) => {
-      const delta = ev.clientX - startX
-      onResize(s.id, Math.max(16, Math.min(80, startSize + delta * 0.6)))
-    }
-    const up = () => {
-      window.removeEventListener('pointermove', move)
-      window.removeEventListener('pointerup', up)
-    }
+    const move = (ev: PointerEvent) => { onResize(s.id, Math.max(16, Math.min(80, startSize + (ev.clientX - startX) * 0.6))) }
+    const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up) }
     window.addEventListener('pointermove', move)
     window.addEventListener('pointerup', up)
   }
@@ -115,25 +103,18 @@ function StickerOverlay({ stickers, onMove, onRemove, onResize, onRotate }: {
     e.preventDefault()
     e.stopPropagation()
       ; (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
-
     const r = ref.current?.getBoundingClientRect()
     if (!r) return
 
     // Sticker center in viewport coords
     const cx = r.left + (s.x / 100) * r.width
     const cy = r.top + (s.y / 100) * r.height
-
     const startAngle = Math.atan2(e.clientY - cy, e.clientX - cx) * (180 / Math.PI)
     const startRotation = s.rotation
-
     const move = (ev: PointerEvent) => {
-      const currentAngle = Math.atan2(ev.clientY - cy, ev.clientX - cx) * (180 / Math.PI)
-      onRotate(s.id, startRotation + (currentAngle - startAngle))
+      onRotate(s.id, startRotation + (Math.atan2(ev.clientY - cy, ev.clientX - cx) * (180 / Math.PI) - startAngle))
     }
-    const up = () => {
-      window.removeEventListener('pointermove', move)
-      window.removeEventListener('pointerup', up)
-    }
+    const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up) }
     window.addEventListener('pointermove', move)
     window.addEventListener('pointerup', up)
   }
@@ -147,121 +128,47 @@ function StickerOverlay({ stickers, onMove, onRemove, onResize, onRotate }: {
     <div
       ref={ref}
       className="absolute inset-0"
-      // style={{ touchAction: 'none' }}
+      style={{ touchAction: selectedId !== null ? 'none' : 'auto' }}
       onClick={handleOverlayClick}
     >
       {stickers.map(s => {
         const isSelected = selectedId === s.id
         const sz = s.size as number
-
         return (
           <div
             key={s.id}
             onPointerDown={e => handleDragPointerDown(e, s)}
             onDoubleClick={() => { onRemove(s.id); setSelectedId(null) }}
             style={{
-              position: 'absolute',
-              left: `${s.x}%`,
-              top: `${s.y}%`,
+              position: 'absolute', left: `${s.x}%`, top: `${s.y}%`,
               transform: `translate(-50%, -50%) rotate(${s.rotation}deg)`,
-              cursor: 'grab',
-              userSelect: 'none',
+              cursor: 'grab', userSelect: 'none',
               outline: isSelected ? '2px dashed rgba(212,104,122,0.8)' : 'none',
-              outlineOffset: 6,
-              borderRadius: 4,
-              zIndex: isSelected ? 20 : 10,
+              outlineOffset: 6, borderRadius: 4, zIndex: isSelected ? 20 : 10,
             }}
           >
-            {/* Emoji */}
-            <span style={{
-              fontSize: sz,
-              display: 'block',
-              lineHeight: 1,
-              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.18))',
-              transition: 'font-size 0.05s linear',
-            }}>
+            <span style={{ fontSize: sz, display: 'block', lineHeight: 1, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.18))', transition: 'font-size 0.05s linear' }}>
               {s.emoji}
             </span>
-
             {isSelected && (
               <>
-                {/* ✕ Remove — top-right */}
                 <button
                   data-role="remove-btn"
                   onPointerDown={e => e.stopPropagation()}
                   onClick={e => { e.stopPropagation(); onRemove(s.id); setSelectedId(null) }}
-                  style={{
-                    position: 'absolute',
-                    top: -12,
-                    right: -12,
-                    width: 20,
-                    height: 20,
-                    borderRadius: '50%',
-                    background: '#E11D48',
-                    border: '1.5px solid white',
-                    color: 'white',
-                    fontSize: 10,
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 30,
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
-                    padding: 0,
-                  }}
+                  style={{ position: 'absolute', top: -12, right: -12, width: 20, height: 20, borderRadius: '50%', background: '#E11D48', border: '1.5px solid white', color: 'white', fontSize: 10, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 30, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', padding: 0 }}
                 >✕</button>
-
-                {/* ↺ Rotate — top-left */}
                 <div
                   data-role="rotate-handle"
                   onPointerDown={e => handleRotatePointerDown(e, s)}
                   title="Drag to rotate"
-                  style={{
-                    position: 'absolute',
-                    top: -12,
-                    left: -12,
-                    width: 20,
-                    height: 20,
-                    borderRadius: '50%',
-                    background: 'white',
-                    border: '1.5px solid rgba(107,72,255,0.7)',
-                    cursor: 'grab',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 30,
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-                    fontSize: 12,
-                    color: 'rgba(107,72,255,0.9)',
-                    touchAction: 'none',
-                  }}
+                  style={{ position: 'absolute', top: -12, left: -12, width: 20, height: 20, borderRadius: '50%', background: 'white', border: '1.5px solid rgba(107,72,255,0.7)', cursor: 'grab', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 30, boxShadow: '0 1px 4px rgba(0,0,0,0.2)', fontSize: 12, color: 'rgba(107,72,255,0.9)', touchAction: 'none' }}
                 >↺</div>
-
-                {/* ⤡ Resize — bottom-right */}
                 <div
                   data-role="resize-handle"
                   onPointerDown={e => handleResizePointerDown(e, s)}
                   title="Drag to resize"
-                  style={{
-                    position: 'absolute',
-                    bottom: -12,
-                    right: -12,
-                    width: 20,
-                    height: 20,
-                    borderRadius: '50%',
-                    background: 'white',
-                    border: '1.5px solid rgba(212,104,122,0.8)',
-                    cursor: 'ew-resize',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 30,
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-                    fontSize: 10,
-                    color: 'rgba(212,104,122,0.9)',
-                    touchAction: 'none',
-                  }}
+                  style={{ position: 'absolute', bottom: -12, right: -12, width: 20, height: 20, borderRadius: '50%', background: 'white', border: '1.5px solid rgba(212,104,122,0.8)', cursor: 'ew-resize', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 30, boxShadow: '0 1px 4px rgba(0,0,0,0.2)', fontSize: 10, color: 'rgba(212,104,122,0.9)', touchAction: 'none' }}
                 >⤡</div>
               </>
             )}
@@ -287,6 +194,28 @@ const rrStroke = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number
 
 function loadImg(src: string): Promise<HTMLImageElement> {
   return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src })
+}
+
+// ─── Cover-fit draw (mimics object-fit: cover) ────────────────────────────────
+// Crops and centers the image to fill (dx,dy,dw,dh) without distortion.
+function drawImageCover(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  dx: number, dy: number, dw: number, dh: number,
+) {
+  const srcAspect = img.naturalWidth / img.naturalHeight
+  const dstAspect = dw / dh
+  let sx = 0, sy = 0, sw = img.naturalWidth, sh = img.naturalHeight
+  if (srcAspect > dstAspect) {
+    // image is wider than dest — crop sides
+    sw = img.naturalHeight * dstAspect
+    sx = (img.naturalWidth - sw) / 2
+  } else {
+    // image is taller than dest — crop top/bottom
+    sh = img.naturalWidth / dstAspect
+    sy = (img.naturalHeight - sh) / 2
+  }
+  ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh)
 }
 
 // ─── Petal burst ─────────────────────────────────────────────────────────────
@@ -444,6 +373,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
   }
 
   // ── Build strip canvas ────────────────────────────────────────────────────
+
   const buildCanvas = useCallback(async (): Promise<HTMLCanvasElement> => {
     const PW = 640, PH = 480
     const PAD = 24, GAP = 14
@@ -472,7 +402,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
         const [px, py] = positions[i]
         const img = await loadImg(photos[i].dataUrl)
         ctx.save(); ctx.shadowColor = 'rgba(30,34,53,0.15)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4
-        rrClip(ctx, px, py, PW, PH, 12); ctx.drawImage(img, px, py, PW, PH); ctx.restore()
+        rrClip(ctx, px, py, PW, PH, 12); drawImageCover(ctx, img, px, py, PW, PH); ctx.restore()
         ctx.strokeStyle = theme.borderColor; ctx.lineWidth = 2; rrStroke(ctx, px, py, PW, PH, 12)
         for (const s of photos[i].stickers) {
           const sx = px + (s.x / 100) * PW, sy = py + (s.y / 100) * PH
@@ -487,23 +417,28 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
       drawFooter(ctx, 0, fy, totalW, FOOTER_H, false)
 
     } else {
+      // Derive photo height from the same aspect ratio shown in the UI preview
+      // single → 4/5 (portrait), strip3/strip4 → 3/2.5 (landscape)
+      const aspectMap: Record<string, number> = { single: 5 / 4, strip3: 2 / 2, strip4: 2 / 2 }
+      const photoH = Math.round(PW * (aspectMap[stripType] ?? 2 / 3))
+
       const stripW = PW + PAD * 2
       const n = photos.length
-      const stripH = PAD + (PH + GAP) * n - GAP + PAD + FOOTER_H
+      const stripH = PAD + (photoH + GAP) * n - GAP + PAD + FOOTER_H
       c = document.createElement('canvas'); c.width = stripW; c.height = stripH
       ctx = c.getContext('2d')!
 
       ctx.fillStyle = theme.bg; ctx.fillRect(0, 0, stripW, stripH)
 
-      // Photos (no header for vertical strip — matches the UI which has no header)
+      // Photos — height derived from UI aspect ratio per strip type
       for (let i = 0; i < photos.length; i++) {
-        const py = PAD + i * (PH + GAP), px = PAD
+        const py = PAD + i * (photoH + GAP), px = PAD
         const img = await loadImg(photos[i].dataUrl)
         ctx.save(); ctx.shadowColor = 'rgba(30,34,53,0.14)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 4
-        rrClip(ctx, px, py, PW, PH, 12); ctx.drawImage(img, px, py, PW, PH); ctx.restore()
-        ctx.strokeStyle = theme.borderColor; ctx.lineWidth = 2; rrStroke(ctx, px, py, PW, PH, 12)
+        rrClip(ctx, px, py, PW, photoH, 12); drawImageCover(ctx, img, px, py, PW, photoH); ctx.restore()
+        ctx.strokeStyle = theme.borderColor; ctx.lineWidth = 2; rrStroke(ctx, px, py, PW, photoH, 12)
         for (const s of photos[i].stickers) {
-          const sx = px + (s.x / 100) * PW, sy = py + (s.y / 100) * PH
+          const sx = px + (s.x / 100) * PW, sy = py + (s.y / 100) * photoH
           ctx.save(); ctx.translate(sx, sy); ctx.rotate(s.rotation * Math.PI / 180)
           ctx.font = `${s.size}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
           ctx.fillText(s.emoji, 0, 0); ctx.restore()
@@ -535,8 +470,8 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
 
   const photoAspect: Record<string, string> = {
     single: '4/5',
-    strip3: '3/2',
-    strip4: '3/2',
+    strip3: '2/2',
+    strip4: '2/2',
     grid2x2: '4/3',
   }
   const slotAspect = photoAspect[stripType] ?? '4/3'
@@ -625,10 +560,8 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
               <div className="flex gap-4">
                 <div className="overflow-hidden rounded-2xl mx-auto"
                   style={{
-                    border: '1px solid rgba(212,104,122,0.15)',
-                    background: theme.bg,
-                    width: '100%',
-                    maxWidth: stripType === 'single' ? 420 : 320,
+                    border: '1px solid rgba(212,104,122,0.15)', background: theme.bg,
+                    width: '100%', maxWidth: stripType === 'single' ? 420 : 320,
                   }}>
                   <div className="flex flex-col gap-2 p-3">
                     {photos.map((p, i) => (
@@ -724,7 +657,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
               <div
                 id="theme-carousel-v"
                 className="overflow-y-auto"
-                style={{ maxHeight: 210, scrollbarWidth: 'none', msOverflowStyle: 'none', scrollBehavior: 'smooth' }}
+                style={{ maxHeight: 160, scrollbarWidth: 'none', msOverflowStyle: 'none', scrollBehavior: 'smooth' }}
               >
                 {Array.from({ length: Math.ceil(THEMES.length / 3) }, (_, rowIdx) => (
                   <div key={rowIdx} className="grid grid-cols-3 gap-2 mb-2">
@@ -734,7 +667,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                         className={`theme-card p-0 overflow-hidden ${selectedTheme === t.id ? 'selected' : ''}`}
                         onClick={() => setSelectedTheme(t.id)}
                       >
-                        <div style={{ height: 46, background: t.bg }} />
+                        <div style={{ height: 28, background: t.bg }} />
                         <p className="text-[9px] font-semibold text-center py-1 leading-none" style={{ color: 'var(--ink)' }}>{t.label}</p>
                       </button>
                     ))}
@@ -757,8 +690,8 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
 
           {/* Actions */}
           <div className="card p-4 flex flex-row gap-3 anim-fade" style={{ animationDelay: '0.3s' }}>
-            <button className="btn btn-outline flex-1 py-3 text-sm" onClick={onRetake}>🔄 Retake</button>
-            <button className="btn btn-primary flex-1 py-3 text-sm" onClick={downloadStrip} disabled={downloading}>
+            <button className="btn btn-outline flex-1 py-3.5 text-sm" onClick={onRetake}>🔄 Retake</button>
+            <button className="btn btn-primary flex-1 py-3.5 text-sm" onClick={downloadStrip} disabled={downloading}>
               {downloading ? <><span className="spin-anim inline-block">✨</span> Saving…</> : <>💾 Download</>}
             </button>
           </div>
