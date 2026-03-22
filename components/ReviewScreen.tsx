@@ -626,7 +626,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                 <div className="overflow-hidden rounded-2xl mx-auto"
                   style={{
                     border: '1px solid rgba(212,104,122,0.15)',
-                    background: theme.bg[0],
+                    background: theme.bg,
                     width: '100%',
                     maxWidth: stripType === 'single' ? 420 : 320,
                   }}>
