@@ -36,15 +36,6 @@ const THEMES: Theme[] = [
     textColor: '#3B2A4A',
   },
   {
-    id: 'white',
-    label: 'White',
-    headerBg: 'linear-gradient(135deg, #FFFFFF, #F5F5F5)',
-    footerBg: 'linear-gradient(135deg, #F5F5F5, #ECECEC)',
-    bg: ['#FFFFFF', '#FAFAFA'],
-    borderColor: 'rgba(0,0,0,0.1)',
-    textColor: '#374151',
-  },
-  {
     id: 'sage',
     label: 'Meadow',
     headerBg: 'linear-gradient(135deg, #7A9E82, #A8C5A0)',
@@ -133,6 +124,15 @@ const THEMES: Theme[] = [
     bg: ['#FFFBEB', '#FFF7ED'],
     borderColor: 'rgba(220,38,38,0.3)',
     textColor: '#B45309',
+  },
+  {
+    id: 'white',
+    label: 'White',
+    headerBg: 'linear-gradient(135deg, #FFFFFF, #F5F5F5)',
+    footerBg: 'linear-gradient(135deg, #F5F5F5, #ECECEC)',
+    bg: ['#FFFFFF', '#FAFAFA'],
+    borderColor: 'rgba(0,0,0,0.1)',
+    textColor: '#374151',
   },
 ]
 
@@ -402,6 +402,15 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
 
   const isGrid = stripType === 'grid2x2'
 
+  // Aspect ratio per strip type for the photo preview slots
+  const photoAspect: Record<string, string> = {
+    single: '4/3',   // landscape, single full photo
+    strip3: '3/2',   // slightly narrower landscape, 3-tall strip
+    strip4: '3/2',   // same as strip3 — classic narrow booth strip
+    grid2x2: '4/3',   // square-ish grid cells
+  }
+  const slotAspect = photoAspect[stripType] ?? '4/3'
+
   return (
     <div className="bg-lumi min-h-screen flex flex-col">
       {showPetals && <PetalBurst />}
@@ -453,7 +462,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                     <div key={i} onClick={() => setSelectedPhoto(i)}
                       className="relative overflow-hidden rounded-xl cursor-pointer transition-all"
                       style={{
-                        aspectRatio: '4/3',
+                        aspectRatio: slotAspect,
                         border: selectedPhoto === i ? `2px solid var(--rose)` : '2px solid transparent',
                         boxShadow: selectedPhoto === i ? '0 0 0 3px rgba(212,104,122,0.2)' : '0 2px 8px rgba(30,34,53,0.1)',
                       }}>
@@ -491,7 +500,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                       <div key={i} onClick={() => setSelectedPhoto(i)}
                         className="relative overflow-hidden rounded-xl cursor-pointer transition-all"
                         style={{
-                          aspectRatio: '16/9',
+                          aspectRatio: slotAspect,
                           border: selectedPhoto === i ? `2px solid var(--rose)` : '2px solid transparent',
                           boxShadow: selectedPhoto === i ? '0 0 0 3px rgba(212,104,122,0.2)' : '0 2px 8px rgba(30,34,53,0.1)',
                         }}>
@@ -516,7 +525,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                   </div>
                   <div className="flex items-center justify-center py-2" style={{ background: theme.footerBg }}>
                     <span className="text-[10px]" style={{ color: stripLabelColor, opacity: 0.75 }}>
-                      {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · LumiBooth
                     </span>
                   </div>
                 </div>
@@ -581,7 +590,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
               >
                 {/* Group themes into rows of 3 */}
                 {Array.from({ length: Math.ceil(THEMES.length / 3) }, (_, rowIdx) => (
-                  <div key={rowIdx} className="grid grid-cols-1 gap-2 mb-2">
+                  <div key={rowIdx} className="grid grid-cols-3 gap-2 mb-2">
                     {THEMES.slice(rowIdx * 3, rowIdx * 3 + 3).map(t => (
                       <button
                         key={t.id}

@@ -158,6 +158,15 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
     single: 'Single Photo', strip3: '3-Strip', strip4: '4-Strip', grid2x2: '2×2 Grid',
   }
 
+  // Per-strip aspect ratio for preview slots
+  const photoAspect: Record<StripType, string> = {
+    single: '4/3',
+    strip3: '3/2',
+    strip4: '3/2',
+    grid2x2: '4/3',
+  }
+  const slotAspect = photoAspect[stripType]
+
   // Shared filter chips — rendered in two places (mobile & desktop)
   const FilterChips = () => (
     <>
@@ -335,7 +344,7 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
                 <div className="grid grid-cols-2 gap-2">
                   {[0, 1, 2, 3].map(i => (
                     <div key={i} className="relative overflow-hidden rounded-xl"
-                      style={{ aspectRatio: '4/3', background: 'linear-gradient(135deg,#F5D5DB22,#C4B5D418)', border: '1.5px dashed rgba(212,104,122,0.25)' }}>
+                      style={{ aspectRatio: slotAspect, background: 'linear-gradient(135deg,#F5D5DB22,#C4B5D418)', border: '1.5px dashed rgba(212,104,122,0.25)' }}>
                       {photos[i] ? (
                         <img src={photos[i].dataUrl} className="w-full h-full object-cover anim-pop"
                           style={{ animationDelay: `${i * 0.06}s`, opacity: 0, animationFillMode: 'forwards' }} alt="" />
@@ -351,7 +360,7 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
                 <div className="flex flex-col gap-2">
                   {Array.from({ length: needed }).map((_, i) => (
                     <div key={i} className="relative overflow-hidden rounded-xl"
-                      style={{ aspectRatio: '16/9', background: 'linear-gradient(135deg,#F5D5DB22,#C4B5D418)', border: '1.5px dashed rgba(212,104,122,0.25)' }}>
+                      style={{ aspectRatio: slotAspect, background: 'linear-gradient(135deg,#F5D5DB22,#C4B5D418)', border: '1.5px dashed rgba(212,104,122,0.25)' }}>
                       {photos[i] ? (
                         <img src={photos[i].dataUrl} className="w-full h-full object-cover anim-pop"
                           style={{ animationDelay: `${i * 0.06}s`, opacity: 0, animationFillMode: 'forwards' }} alt="" />
