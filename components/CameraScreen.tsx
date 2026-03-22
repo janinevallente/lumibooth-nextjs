@@ -201,7 +201,7 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
         </button>
       </div>
 
-      <div className="flex flex-col gap-4 px-4 sm:px-6 pb-8 flex-1 max-w-[1110px] mx-auto w-full">
+      <div className={`flex flex-col gap-4 px-4 sm:px-6 pb-8 flex-1 mx-auto w-full ${stripType === 'single' ? 'max-w-[1110px]' : 'max-w-[1020px]'}`}>
         {/* Status bar */}
         <div className="anim-fade" style={{ animationDelay: '0.1s' }}>
           <div className="flex items-center justify-between">
