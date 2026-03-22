@@ -36,6 +36,15 @@ const THEMES: Theme[] = [
     textColor: '#3B2A4A',
   },
   {
+    id: 'white',
+    label: 'White',
+    headerBg: 'linear-gradient(135deg, #FFFFFF, #F5F5F5)',
+    footerBg: 'linear-gradient(135deg, #F5F5F5, #ECECEC)',
+    bg: ['#FFFFFF', '#FAFAFA'],
+    borderColor: 'rgba(0,0,0,0.1)',
+    textColor: '#374151',
+  },
+  {
     id: 'sage',
     label: 'Meadow',
     headerBg: 'linear-gradient(135deg, #7A9E82, #A8C5A0)',
@@ -124,15 +133,6 @@ const THEMES: Theme[] = [
     bg: ['#FFFBEB', '#FFF7ED'],
     borderColor: 'rgba(220,38,38,0.3)',
     textColor: '#B45309',
-  },
-  {
-    id: 'white',
-    label: 'White',
-    headerBg: 'linear-gradient(135deg, #FFFFFF, #F5F5F5)',
-    footerBg: 'linear-gradient(135deg, #F5F5F5, #ECECEC)',
-    bg: ['#FFFFFF', '#FAFAFA'],
-    borderColor: 'rgba(0,0,0,0.1)',
-    textColor: '#374151',
   },
 ]
 
@@ -244,6 +244,13 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
   const [downloading, setDownloading] = useState(false)
 
   const theme = THEMES.find(t => t.id === selectedTheme) ?? THEMES[0]
+  const isWhite = theme.id === 'white'
+  const headerTextColor = isWhite ? '#D4697B' : 'rgba(255,255,255,0.9)'
+  const headerSubTextColor = isWhite ? 'rgba(212,105,123,0.65)' : 'rgba(255,255,255,0.65)'
+  const footerTextColor = isWhite ? '#D4697B' : 'rgba(255,255,255,0.9)'
+  const footerSubTextColor = isWhite ? 'rgba(212,105,123,0.6)' : 'rgba(255,255,255,0.55)'
+  // Also used in the UI preview strip header/footer spans
+  const stripLabelColor = isWhite ? '#D4697B' : 'white'
 
   const addSticker = (emoji: string) => {
     const s: Sticker = {
@@ -293,9 +300,9 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
       const [hc1, hc2] = theme.headerBg.includes('#') ? theme.headerBg.match(/#[0-9a-f]{6}/gi)! : ['#D4687A', '#EBA8B4']
       hg.addColorStop(0, hc1); hg.addColorStop(1, hc2)
       ctx.fillStyle = hg; ctx.fillRect(0, 0, totalW, HEADER_H)
-      ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.font = 'bold 38px serif'; ctx.textAlign = 'center'
+      ctx.fillStyle = headerTextColor; ctx.font = 'bold 38px serif'; ctx.textAlign = 'center'
       ctx.fillText('LumiBooth', totalW / 2, 56)
-      ctx.font = '13px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.65)'
+      ctx.font = '13px sans-serif'; ctx.fillStyle = headerSubTextColor
       ctx.fillText('Capture your glowing moments', totalW / 2, 78)
 
       // Photos 2x2
@@ -323,9 +330,9 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
       const [fc1, fc2] = theme.footerBg.includes('#') ? theme.footerBg.match(/#[0-9a-f]{6}/gi)! : ['#EBA8B4', '#C4B5D4']
       fg.addColorStop(0, fc1); fg.addColorStop(1, fc2)
       ctx.fillStyle = fg; ctx.fillRect(0, fy, totalW, FOOTER_H)
-      ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.font = '500 15px sans-serif'; ctx.textAlign = 'center'
+      ctx.fillStyle = footerTextColor; ctx.font = '500 15px sans-serif'; ctx.textAlign = 'center'
       ctx.fillText(new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }), totalW / 2, fy + 30)
-      ctx.font = '12px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.55)'
+      ctx.font = '12px sans-serif'; ctx.fillStyle = footerSubTextColor
       ctx.fillText('🌸 A photo from LumiBooth', totalW / 2, fy + 50)
 
     } else {
@@ -347,9 +354,9 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
       const [hc12, hc22] = theme.headerBg.includes('#') ? theme.headerBg.match(/#[0-9a-f]{6}/gi)! : ['#D4687A', '#EBA8B4']
       hg2.addColorStop(0, hc12); hg2.addColorStop(1, hc22)
       ctx.fillStyle = hg2; ctx.fillRect(0, 0, stripW, HEADER_H)
-      ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.font = 'bold 38px serif'; ctx.textAlign = 'center'
+      ctx.fillStyle = headerTextColor; ctx.font = 'bold 38px serif'; ctx.textAlign = 'center'
       ctx.fillText('LumiBooth', stripW / 2, 56)
-      ctx.font = '13px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.65)'
+      ctx.font = '13px sans-serif'; ctx.fillStyle = headerSubTextColor
       ctx.fillText('Capture your glowing moments', stripW / 2, 78)
 
       for (let i = 0; i < photos.length; i++) {
@@ -371,14 +378,14 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
       const [fc12, fc22] = theme.footerBg.includes('#') ? theme.footerBg.match(/#[0-9a-f]{6}/gi)! : ['#EBA8B4', '#C4B5D4']
       fg2.addColorStop(0, fc12); fg2.addColorStop(1, fc22)
       ctx.fillStyle = fg2; ctx.fillRect(0, fy2, stripW, FOOTER_H)
-      ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.font = '500 15px sans-serif'; ctx.textAlign = 'center'
+      ctx.fillStyle = footerTextColor; ctx.font = '500 15px sans-serif'; ctx.textAlign = 'center'
       ctx.fillText(new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }), stripW / 2, fy2 + 30)
-      ctx.font = '12px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.55)'
+      ctx.font = '12px sans-serif'; ctx.fillStyle = footerSubTextColor
       ctx.fillText('🌸 A photo from LumiBooth', stripW / 2, fy2 + 50)
     }
 
     return c
-  }, [photos, stripType, theme])
+  }, [photos, stripType, theme, headerTextColor, headerSubTextColor, footerTextColor, footerSubTextColor])
 
   const downloadStrip = useCallback(async () => {
     setDownloading(true)
@@ -439,7 +446,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
               <div className="overflow-hidden rounded-2xl" style={{ border: '1px solid rgba(212,104,122,0.15)', background: theme.bg[0] }}>
                 {/* Mini header */}
                 <div className="flex items-center justify-center py-2" style={{ background: theme.headerBg }}>
-                  <span className="text-white text-xs font-semibold tracking-wider">LumiBooth 🌸</span>
+                  <span className="text-xs font-semibold tracking-wider" style={{ color: stripLabelColor }}>LumiBooth 🌸</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 p-3">
                   {photos.map((p, i) => (
@@ -466,7 +473,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                   ))}
                 </div>
                 <div className="flex items-center justify-center py-1.5" style={{ background: theme.footerBg }}>
-                  <span className="text-white text-[10px] opacity-80">
+                  <span className="text-[10px]" style={{ color: stripLabelColor, opacity: 0.8 }}>
                     {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 </div>
@@ -477,7 +484,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                 <div className="overflow-hidden rounded-2xl flex-1 max-w-xs mx-auto"
                   style={{ border: '1px solid rgba(212,104,122,0.15)', background: theme.bg[0] }}>
                   <div className="flex items-center justify-center py-3" style={{ background: theme.headerBg }}>
-                    <span className="text-white text-sm font-semibold tracking-wide">LumiBooth 🌸</span>
+                    <span className="text-sm font-semibold tracking-wide" style={{ color: stripLabelColor }}>LumiBooth 🌸</span>
                   </div>
                   <div className="flex flex-col gap-2 p-3">
                     {photos.map((p, i) => (
@@ -508,8 +515,8 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                     ))}
                   </div>
                   <div className="flex items-center justify-center py-2" style={{ background: theme.footerBg }}>
-                    <span className="text-white text-[10px] opacity-75">
-                      {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · LumiBooth
+                    <span className="text-[10px]" style={{ color: stripLabelColor, opacity: 0.75 }}>
+                      {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                   </div>
                 </div>
@@ -517,22 +524,6 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
             )}
           </div>
 
-          {/* Theme picker */}
-          <div className="card p-4 anim-fade" style={{ animationDelay: '0.25s' }}>
-            <p className="text-xs font-semibold uppercase tracking-wide mb-3" style={{ color: 'var(--muted)' }}>Strip Theme</p>
-            <div className="grid grid-cols-4 gap-2">
-              {THEMES.map(t => (
-                <button key={t.id}
-                  className={`theme-card p-0 overflow-hidden ${selectedTheme === t.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedTheme(t.id)}>
-                  <div style={{ height: 28, background: t.headerBg }} />
-                  <div style={{ height: 16, background: `linear-gradient(135deg, ${t.bg[0]}, ${t.bg[1]})` }} />
-                  <div style={{ height: 16, background: t.footerBg }} />
-                  <p className="text-[10px] font-semibold text-center py-1.5" style={{ color: 'var(--ink)' }}>{t.label}</p>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Right: sticker panel + actions */}
@@ -558,14 +549,78 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
             </div>
           </div>
 
+          {/* Theme picker — vertical carousel, 3 visible at a time */}
+          <div className="card p-4 anim-fade" style={{ animationDelay: '0.25s' }}>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--muted)' }}>Strip Theme</p>
+              <span className="text-[10px] font-medium" style={{ color: 'var(--rose)' }}>
+                {THEMES.findIndex(t => t.id === selectedTheme) + 1} / {THEMES.length}
+              </span>
+            </div>
+            <div className="relative">
+              {/* Up arrow */}
+              <button
+                className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-6 h-5 flex items-center justify-center text-xs font-bold z-10 rounded-full"
+                style={{ background: 'white', border: '1px solid rgba(212,104,122,0.25)', boxShadow: '0 2px 6px rgba(30,34,53,0.1)', color: 'var(--rose)' }}
+                onClick={() => {
+                  const el = document.getElementById('theme-carousel-v')
+                  if (el) el.scrollBy({ top: -((el.scrollHeight / Math.ceil(THEMES.length / 3))), behavior: 'smooth' })
+                }}
+              >︿</button>
+
+              {/* Scroll track — shows 3 rows, each row = 3 themes side by side */}
+              <div
+                id="theme-carousel-v"
+                className="overflow-y-auto"
+                style={{
+                  maxHeight: 240,
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  scrollBehavior: 'smooth',
+                }}
+              >
+                {/* Group themes into rows of 3 */}
+                {Array.from({ length: Math.ceil(THEMES.length / 3) }, (_, rowIdx) => (
+                  <div key={rowIdx} className="grid grid-cols-1 gap-2 mb-2">
+                    {THEMES.slice(rowIdx * 3, rowIdx * 3 + 3).map(t => (
+                      <button
+                        key={t.id}
+                        className={`theme-card p-0 overflow-hidden ${selectedTheme === t.id ? 'selected' : ''}`}
+                        onClick={() => setSelectedTheme(t.id)}
+                      >
+                        <div style={{ height: 22, background: t.headerBg }} />
+                        <div style={{ height: 12, background: `linear-gradient(135deg, ${t.bg[0]}, ${t.bg[1]})` }} />
+                        <div style={{ height: 12, background: t.footerBg }} />
+                        <p className="text-[9px] font-semibold text-center py-1 leading-none" style={{ color: 'var(--ink)' }}>{t.label}</p>
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+
+              {/* Down arrow */}
+              <button
+                className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full w-6 h-5 flex items-center justify-center text-xs font-bold z-10 rounded-full"
+                style={{ background: 'white', border: '1px solid rgba(212,104,122,0.25)', boxShadow: '0 2px 6px rgba(30,34,53,0.1)', color: 'var(--rose)' }}
+                onClick={() => {
+                  const el = document.getElementById('theme-carousel-v')
+                  if (el) el.scrollBy({ top: (el.scrollHeight / Math.ceil(THEMES.length / 3)), behavior: 'smooth' })
+                }}
+              >﹀</button>
+            </div>
+            {/* Selected label */}
+            <p className="text-[10px] text-center mt-3 font-medium" style={{ color: 'var(--rose)' }}>
+              {THEMES.find(t => t.id === selectedTheme)?.label}
+            </p>
+          </div>
+
           {/* Actions */}
-          <div className="card p-4 flex flex-col gap-3 anim-fade" style={{ animationDelay: '0.3s' }}>
-            <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--muted)' }}>Actions</p>
-            <button className="btn btn-primary w-full py-3.5 text-sm" onClick={downloadStrip} disabled={downloading}>
-              {downloading ? <><span className="spin-anim inline-block">✨</span> Saving…</> : <>💾 Download Strip</>}
+          <div className="p-4 flex flex-col md:flex-row gap-3 anim-fade" style={{ animationDelay: '0.3s' }}>
+            <button className="btn btn-outline w-full py-3 text-sm" onClick={onRetake}>
+              🔄 Retake
             </button>
-            <button className="btn btn-outline w-full py-3.5 text-sm" onClick={onRetake}>
-              🔄 Retake Photos
+            <button className="btn btn-primary w-full py-3 text-sm" onClick={downloadStrip} disabled={downloading}>
+              {downloading ? <><span className="spin-anim inline-block">✨</span> Saving…</> : <>💾 Download</>}
             </button>
           </div>
 
