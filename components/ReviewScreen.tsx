@@ -9,122 +9,26 @@ import { StripType } from './StripSelector'
 interface Theme {
   id: string
   label: string
-  headerBg: string
-  footerBg: string
-  bg: [string, string]
+  bg: string
   borderColor: string
   textColor: string
 }
 
 const THEMES: Theme[] = [
-  {
-    id: 'blossom',
-    label: 'Blossom',
-    headerBg: 'linear-gradient(135deg, #D4687A, #EBA8B4)',
-    footerBg: 'linear-gradient(135deg, #EBA8B4, #C4B5D4)',
-    bg: ['#FDF6F0', '#F7EEF5'],
-    borderColor: 'rgba(212,104,122,0.4)',
-    textColor: '#D4687A',
-  },
-  {
-    id: 'midnight',
-    label: 'Midnight',
-    headerBg: 'linear-gradient(135deg, #1E2235, #2A3050)',
-    footerBg: 'linear-gradient(135deg, #2A3050, #3B2A4A)',
-    bg: ['#F0EEF8', '#E8E4F0'],
-    borderColor: 'rgba(100,90,140,0.4)',
-    textColor: '#3B2A4A',
-  },
-  {
-    id: 'sage',
-    label: 'Meadow',
-    headerBg: 'linear-gradient(135deg, #7A9E82, #A8C5A0)',
-    footerBg: 'linear-gradient(135deg, #A8C5A0, #C4D4B8)',
-    bg: ['#F2F7F2', '#EAF2EA'],
-    borderColor: 'rgba(122,158,130,0.4)',
-    textColor: '#5A8060',
-  },
-  {
-    id: 'honey',
-    label: 'Honey',
-    headerBg: 'linear-gradient(135deg, #C9A96E, #DFC08A)',
-    footerBg: 'linear-gradient(135deg, #DFC08A, #EDD4A0)',
-    bg: ['#FDF8F0', '#FAF2E4'],
-    borderColor: 'rgba(201,169,110,0.4)',
-    textColor: '#A07840',
-  },
-  {
-    id: 'aurora',
-    label: 'Aurora',
-    headerBg: 'linear-gradient(135deg, #6B48FF, #A78BFA)',
-    footerBg: 'linear-gradient(135deg, #A78BFA, #F0ABFC)',
-    bg: ['#F5F0FF', '#EEF0FF'],
-    borderColor: 'rgba(107,72,255,0.35)',
-    textColor: '#6B48FF',
-  },
-  {
-    id: 'peach',
-    label: 'Peach',
-    headerBg: 'linear-gradient(135deg, #F97316, #FDBA74)',
-    footerBg: 'linear-gradient(135deg, #FDBA74, #FDE68A)',
-    bg: ['#FFF7ED', '#FFF3E0'],
-    borderColor: 'rgba(249,115,22,0.35)',
-    textColor: '#C2410C',
-  },
-  {
-    id: 'ocean',
-    label: 'Ocean',
-    headerBg: 'linear-gradient(135deg, #0369A1, #38BDF8)',
-    footerBg: 'linear-gradient(135deg, #38BDF8, #7DD3FC)',
-    bg: ['#F0F9FF', '#E0F4FF'],
-    borderColor: 'rgba(3,105,161,0.35)',
-    textColor: '#0369A1',
-  },
-  {
-    id: 'noir',
-    label: 'Noir',
-    headerBg: 'linear-gradient(135deg, #18181B, #3F3F46)',
-    footerBg: 'linear-gradient(135deg, #3F3F46, #52525B)',
-    bg: ['#FAFAFA', '#F4F4F5'],
-    borderColor: 'rgba(24,24,27,0.4)',
-    textColor: '#18181B',
-  },
-  {
-    id: 'cherry',
-    label: 'Cherry',
-    headerBg: 'linear-gradient(135deg, #9F1239, #E11D48)',
-    footerBg: 'linear-gradient(135deg, #E11D48, #FB7185)',
-    bg: ['#FFF1F2', '#FFE4E6'],
-    borderColor: 'rgba(159,18,57,0.35)',
-    textColor: '#9F1239',
-  },
-  {
-    id: 'matcha',
-    label: 'Matcha',
-    headerBg: 'linear-gradient(135deg, #3D6B4F, #6B9E7A)',
-    footerBg: 'linear-gradient(135deg, #6B9E7A, #A3C4A8)',
-    bg: ['#F0F7F2', '#E8F2EB'],
-    borderColor: 'rgba(61,107,79,0.35)',
-    textColor: '#3D6B4F',
-  },
-  {
-    id: 'sunset',
-    label: 'Sunset',
-    headerBg: 'linear-gradient(135deg, #DC2626, #F97316, #FBBF24)',
-    footerBg: 'linear-gradient(135deg, #FBBF24, #FDE68A)',
-    bg: ['#FFFBEB', '#FFF7ED'],
-    borderColor: 'rgba(220,38,38,0.3)',
-    textColor: '#B45309',
-  },
-  {
-    id: 'white',
-    label: 'White',
-    headerBg: 'linear-gradient(135deg, #FFFFFF, #F5F5F5)',
-    footerBg: 'linear-gradient(135deg, #F5F5F5, #ECECEC)',
-    bg: ['#FFFFFF', '#FAFAFA'],
-    borderColor: 'rgba(0,0,0,0.1)',
-    textColor: '#374151',
-  },
+  { id: 'blossom', label: 'Blossom', bg: '#EBA8B4', borderColor: 'rgba(212,104,122,0.4)', textColor: '#D4687A' },
+  { id: 'blush', label: 'Blush', bg: '#F2C4CE', borderColor: 'rgba(212,104,122,0.3)', textColor: '#B05070' },
+  { id: 'cherry', label: 'Cherry', bg: '#9F1239', borderColor: 'rgba(159,18,57,0.35)', textColor: '#9F1239' },
+  { id: 'lavender', label: 'Lavender', bg: '#C9B8E8', borderColor: 'rgba(150,120,210,0.4)', textColor: '#6B4FA0' },
+  { id: 'midnight', label: 'Midnight', bg: '#2A3050', borderColor: 'rgba(100,90,140,0.4)', textColor: '#3B2A4A' },
+  { id: 'dustyblue', label: 'Dusty Blue', bg: '#7BA7BC', borderColor: 'rgba(123,167,188,0.45)', textColor: '#3A6E87' },
+  { id: 'ocean', label: 'Ocean', bg: '#0369A1', borderColor: 'rgba(3,105,161,0.35)', textColor: '#0369A1' },
+  { id: 'seafoam', label: 'Seafoam', bg: '#7EC8C8', borderColor: 'rgba(126,200,200,0.45)', textColor: '#2E8B8B' },
+  { id: 'mist', label: 'Mist', bg: '#B8CFCF', borderColor: 'rgba(90,150,150,0.4)', textColor: '#3A6B6B' },
+  { id: 'moss', label: 'Moss', bg: '#8FA96B', borderColor: 'rgba(100,140,80,0.4)', textColor: '#4A6830' },
+  { id: 'matcha', label: 'Matcha', bg: '#3D6B4F', borderColor: 'rgba(61,107,79,0.35)', textColor: '#3D6B4F' },
+  { id: 'sand', label: 'Sand', bg: '#ecd29f', borderColor: 'rgba(180,150,90,0.35)', textColor: '#8B6914' },
+  { id: 'white', label: 'White', bg: '#f5f2f2', borderColor: 'rgba(0,0,0,0.1)', textColor: '#374151' },
+  { id: 'noir', label: 'Noir', bg: '#3F3F46', borderColor: 'rgba(24,24,27,0.4)', textColor: '#18181B' },
 ]
 
 // ─── Sticker emojis ───────────────────────────────────────────────────────────
@@ -287,13 +191,24 @@ function StickerOverlay({ stickers, onMove, onRemove, onResize, onRotate }: {
                   onPointerDown={e => e.stopPropagation()}
                   onClick={e => { e.stopPropagation(); onRemove(s.id); setSelectedId(null) }}
                   style={{
-                    position: 'absolute', top: -12, right: -12,
-                    width: 20, height: 20, borderRadius: '50%',
-                    background: '#E11D48', border: '1.5px solid white',
-                    color: 'white', fontSize: 10, fontWeight: 700,
-                    cursor: 'pointer', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                    zIndex: 30, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', padding: 0,
+                    position: 'absolute',
+                    top: -12,
+                    right: -12,
+                    width: 20,
+                    height: 20,
+                    borderRadius: '50%',
+                    background: '#E11D48',
+                    border: '1.5px solid white',
+                    color: 'white',
+                    fontSize: 10,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 30,
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+                    padding: 0,
                   }}
                 >✕</button>
 
@@ -303,13 +218,22 @@ function StickerOverlay({ stickers, onMove, onRemove, onResize, onRotate }: {
                   onPointerDown={e => handleRotatePointerDown(e, s)}
                   title="Drag to rotate"
                   style={{
-                    position: 'absolute', top: -12, left: -12,
-                    width: 20, height: 20, borderRadius: '50%',
-                    background: 'white', border: '1.5px solid rgba(107,72,255,0.7)',
-                    cursor: 'grab', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                    zIndex: 30, boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-                    fontSize: 12, color: 'rgba(107,72,255,0.9)',
+                    position: 'absolute',
+                    top: -12,
+                    left: -12,
+                    width: 20,
+                    height: 20,
+                    borderRadius: '50%',
+                    background: 'white',
+                    border: '1.5px solid rgba(107,72,255,0.7)',
+                    cursor: 'grab',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 30,
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+                    fontSize: 12,
+                    color: 'rgba(107,72,255,0.9)',
                     touchAction: 'none',
                   }}
                 >↺</div>
@@ -320,13 +244,22 @@ function StickerOverlay({ stickers, onMove, onRemove, onResize, onRotate }: {
                   onPointerDown={e => handleResizePointerDown(e, s)}
                   title="Drag to resize"
                   style={{
-                    position: 'absolute', bottom: -12, right: -12,
-                    width: 20, height: 20, borderRadius: '50%',
-                    background: 'white', border: '1.5px solid rgba(212,104,122,0.8)',
-                    cursor: 'ew-resize', display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                    zIndex: 30, boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-                    fontSize: 10, color: 'rgba(212,104,122,0.9)',
+                    position: 'absolute',
+                    bottom: -12,
+                    right: -12,
+                    width: 20,
+                    height: 20,
+                    borderRadius: '50%',
+                    background: 'white',
+                    border: '1.5px solid rgba(212,104,122,0.8)',
+                    cursor: 'ew-resize',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 30,
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+                    fontSize: 10,
+                    color: 'rgba(212,104,122,0.9)',
                     touchAction: 'none',
                   }}
                 >⤡</div>
@@ -396,12 +329,14 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
 
   const theme = THEMES.find(t => t.id === selectedTheme) ?? THEMES[0]
   const isWhite = theme.id === 'white'
-  const headerTextColor = isWhite ? '#D4697B' : 'rgba(255,255,255,0.9)'
-  const headerSubTextColor = isWhite ? 'rgba(212,105,123,0.65)' : 'rgba(255,255,255,0.65)'
-  const footerTextColor = isWhite ? '#D4697B' : 'rgba(255,255,255,0.9)'
-  const footerSubTextColor = isWhite ? 'rgba(212,105,123,0.6)' : 'rgba(255,255,255,0.55)'
-  // Also used in the UI preview strip header/footer spans
-  const stripLabelColor = isWhite ? '#D4697B' : 'white'
+
+  // ── Text colors that match what's shown in the UI preview ─────────────────
+  // stripLabelColor: used for "LumiBooth" title and footer text in UI
+  const stripLabelColor = isWhite ? '#1f2336' : 'white'
+  // subtext color (opacity applied inline in UI, baked here as rgba)
+  const stripSubColor = isWhite ? 'rgba(31,35,54,0.55)' : 'rgba(255,255,255,0.55)'
+  // rose accent used for "Lumi" portion of the title
+  const roseAccent = '#D4687A'
 
   const addSticker = (emoji: string) => {
     const s: Sticker = {
@@ -415,60 +350,123 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
 
   const moveSticker = (idx: number, id: string, x: number, y: number) =>
     setPhotos(prev => prev.map((p, i) => i === idx
-      ? { ...p, stickers: p.stickers.map(s => s.id === id ? { ...s, x, y } : s) }
-      : p))
+      ? { ...p, stickers: p.stickers.map(s => s.id === id ? { ...s, x, y } : s) } : p))
 
   const removeSticker = (idx: number, id: string) =>
     setPhotos(prev => prev.map((p, i) => i === idx
-      ? { ...p, stickers: p.stickers.filter(s => s.id !== id) }
-      : p))
+      ? { ...p, stickers: p.stickers.filter(s => s.id !== id) } : p))
 
   const resizeSticker = (idx: number, id: string, size: number) =>
     setPhotos(prev => prev.map((p, i) => i === idx
-      ? { ...p, stickers: p.stickers.map(s => s.id === id ? { ...s, size } : s) }
-      : p))
+      ? { ...p, stickers: p.stickers.map(s => s.id === id ? { ...s, size } : s) } : p))
 
   const rotateSticker = (idx: number, id: string, rotation: number) =>
     setPhotos(prev => prev.map((p, i) => i === idx
-      ? { ...p, stickers: p.stickers.map(s => s.id === id ? { ...s, rotation } : s) }
-      : p))
+      ? { ...p, stickers: p.stickers.map(s => s.id === id ? { ...s, rotation } : s) } : p))
 
   const getFilterCss = (f: FilterId) => FILTERS.find(x => x.id === f)?.css ?? 'none'
 
-  // ── Build strip canvas ────────────────────────────────────────────────────
+  // ── Draw footer block — matches UI footer exactly ─────────────────────────
+  // UI footer (vertical strip): "Lumibooth" title (italic Lumi + Booth), tagline, date
+  // UI header (grid): same pattern but at top
+  // Canvas renders both identically.
+  const drawFooter = (
+    ctx: CanvasRenderingContext2D,
+    x: number, y: number, w: number, h: number,
+    isHeader = false,
+  ) => {
+    ctx.fillStyle = theme.bg
+    ctx.fillRect(x, y, w, h)
 
+    const cx = x + w / 2
+    const date = new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }).replace(/\//g, '.')
+
+    if (isHeader) {
+      // Grid header: just the branded title centered
+      ctx.textAlign = 'center'
+      // "Lumi" in rose italic
+      ctx.font = 'italic bold 42px serif'
+      const lumiW = ctx.measureText('Lumi').width
+      // "Booth" in stripLabelColor normal
+      ctx.font = 'bold 42px serif'
+      const boothW = ctx.measureText('Booth').width
+      const totalW = lumiW + boothW
+      const startX = cx - totalW / 2
+
+      ctx.font = 'italic bold 42px serif'
+      ctx.fillStyle = roseAccent
+      ctx.textAlign = 'left'
+      ctx.textBaseline = 'middle'
+      ctx.fillText('Lumi', startX, y + h / 2)
+
+      ctx.font = 'bold 42px serif'
+      ctx.fillStyle = stripLabelColor
+      ctx.fillText('Booth', startX + lumiW, y + h / 2)
+    } else {
+      // Vertical strip footer: title + tagline + date stacked
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+
+      // Row 1 — "LumiBooth" title (Lumi in rose italic, Booth in label color)
+      const titleY = y + h * 0.28
+      ctx.font = 'italic bold 34px serif'
+      const lumiW2 = ctx.measureText('Lumi').width
+      ctx.font = 'bold 34px serif'
+      const boothW2 = ctx.measureText('Booth').width
+      const total2 = lumiW2 + boothW2
+      const startX2 = cx - total2 / 2
+
+      ctx.font = 'italic bold 34px serif'
+      ctx.fillStyle = roseAccent
+      ctx.textAlign = 'left'
+      ctx.fillText('Lumi', startX2, titleY)
+
+      ctx.font = 'bold 34px serif'
+      ctx.fillStyle = stripLabelColor
+      ctx.fillText('Booth', startX2 + lumiW2, titleY)
+
+      // Row 2 — tagline
+      ctx.font = '500 18px sans-serif'
+      ctx.fillStyle = stripLabelColor
+      ctx.globalAlpha = 0.9
+      ctx.textAlign = 'center'
+      ctx.fillText('Capture your glowing moments 🌸', cx, y + h * 0.58)
+
+      // Row 3 — date
+      ctx.font = '13px sans-serif'
+      ctx.fillStyle = stripSubColor
+      ctx.globalAlpha = 1
+      ctx.fillText(date, cx, y + h * 0.82)
+    }
+
+    ctx.globalAlpha = 1
+    ctx.textBaseline = 'alphabetic'
+  }
+
+  // ── Build strip canvas ────────────────────────────────────────────────────
   const buildCanvas = useCallback(async (): Promise<HTMLCanvasElement> => {
     const PW = 640, PH = 480
     const PAD = 24, GAP = 14
-    const HEADER_H = 96, FOOTER_H = 64
+    const FOOTER_H = 110
 
     let c: HTMLCanvasElement, ctx: CanvasRenderingContext2D
 
     if (stripType === 'grid2x2') {
+      // No header — matches UI preview which starts photos at the top with just PAD
       const cols = 2
       const totalW = PW * cols + PAD * (cols + 1)
-      const totalH = HEADER_H + PAD + PH + GAP + PH + PAD + FOOTER_H
+      const totalH = PAD + PH + GAP + PH + PAD + FOOTER_H
       c = document.createElement('canvas'); c.width = totalW; c.height = totalH
       ctx = c.getContext('2d')!
 
-      const bg = ctx.createLinearGradient(0, 0, totalW, totalH)
-      bg.addColorStop(0, theme.bg[0]); bg.addColorStop(1, theme.bg[1])
-      ctx.fillStyle = bg; ctx.fillRect(0, 0, totalW, totalH)
+      ctx.fillStyle = theme.bg; ctx.fillRect(0, 0, totalW, totalH)
 
-      ctx.fillStyle = 'rgba(212,104,122,0.12)'
-      for (let dx = 20; dx < totalW; dx += 30) for (let dy = 20; dy < totalH; dy += 30) { ctx.beginPath(); ctx.arc(dx, dy, 2, 0, Math.PI * 2); ctx.fill() }
-
-      const hg = ctx.createLinearGradient(0, 0, totalW, HEADER_H)
-      const [hc1, hc2] = theme.headerBg.includes('#') ? theme.headerBg.match(/#[0-9a-f]{6}/gi)! : ['#D4687A', '#EBA8B4']
-      hg.addColorStop(0, hc1); hg.addColorStop(1, hc2)
-      ctx.fillStyle = hg; ctx.fillRect(0, 0, totalW, HEADER_H)
-      ctx.fillStyle = headerTextColor; ctx.font = 'bold 38px serif'; ctx.textAlign = 'center'
-      ctx.fillText('LumiBooth', totalW / 2, 56)
-      ctx.font = '13px sans-serif'; ctx.fillStyle = headerSubTextColor
-
+      // Photos 2x2 — starting at PAD from top (no header offset)
       const positions = [
-        [PAD, HEADER_H + PAD], [PW + PAD * 2, HEADER_H + PAD],
-        [PAD, HEADER_H + PAD + PH + GAP], [PW + PAD * 2, HEADER_H + PAD + PH + GAP],
+        [PAD, PAD],
+        [PW + PAD * 2, PAD],
+        [PAD, PAD + PH + GAP],
+        [PW + PAD * 2, PAD + PH + GAP],
       ]
       for (let i = 0; i < Math.min(photos.length, 4); i++) {
         const [px, py] = positions[i]
@@ -484,39 +482,22 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
         }
       }
 
+      // Footer — same as vertical strip (title + tagline + date)
       const fy = totalH - FOOTER_H
-      const fg = ctx.createLinearGradient(0, fy, totalW, totalH)
-      const [fc1, fc2] = theme.footerBg.includes('#') ? theme.footerBg.match(/#[0-9a-f]{6}/gi)! : ['#EBA8B4', '#C4B5D4']
-      fg.addColorStop(0, fc1); fg.addColorStop(1, fc2)
-      ctx.fillStyle = fg; ctx.fillRect(0, fy, totalW, FOOTER_H)
-      ctx.fillStyle = footerTextColor; ctx.font = '500 15px sans-serif'; ctx.textAlign = 'center'
-      ctx.fillText("Capture your glowing moments 🌸", totalW / 2, fy + 30)
-      ctx.font = '12px sans-serif'; ctx.fillStyle = footerSubTextColor
-      ctx.fillText(new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }).replace(/\//g, '.'), totalW / 2, fy + 50)
+      drawFooter(ctx, 0, fy, totalW, FOOTER_H, false)
+
     } else {
       const stripW = PW + PAD * 2
       const n = photos.length
-      const stripH = HEADER_H + PAD + (PH + GAP) * n - GAP + PAD + FOOTER_H
+      const stripH = PAD + (PH + GAP) * n - GAP + PAD + FOOTER_H
       c = document.createElement('canvas'); c.width = stripW; c.height = stripH
       ctx = c.getContext('2d')!
 
-      const bg = ctx.createLinearGradient(0, 0, stripW, stripH)
-      bg.addColorStop(0, theme.bg[0]); bg.addColorStop(1, theme.bg[1])
-      ctx.fillStyle = bg; ctx.fillRect(0, 0, stripW, stripH)
+      ctx.fillStyle = theme.bg; ctx.fillRect(0, 0, stripW, stripH)
 
-      ctx.fillStyle = 'rgba(212,104,122,0.1)'
-      for (let dx = 20; dx < stripW; dx += 28) for (let dy = 20; dy < stripH; dy += 28) { ctx.beginPath(); ctx.arc(dx, dy, 2, 0, Math.PI * 2); ctx.fill() }
-
-      const hg2 = ctx.createLinearGradient(0, 0, stripW, HEADER_H)
-      const [hc12, hc22] = theme.headerBg.includes('#') ? theme.headerBg.match(/#[0-9a-f]{6}/gi)! : ['#D4687A', '#EBA8B4']
-      hg2.addColorStop(0, hc12); hg2.addColorStop(1, hc22)
-      ctx.fillStyle = hg2; ctx.fillRect(0, 0, stripW, HEADER_H)
-      ctx.fillStyle = headerTextColor; ctx.font = 'bold 38px serif'; ctx.textAlign = 'center'
-      ctx.fillText('LumiBooth', stripW / 2, 56)
-      ctx.font = '13px sans-serif'; ctx.fillStyle = headerSubTextColor
-
+      // Photos (no header for vertical strip — matches the UI which has no header)
       for (let i = 0; i < photos.length; i++) {
-        const py = HEADER_H + PAD + i * (PH + GAP), px = PAD
+        const py = PAD + i * (PH + GAP), px = PAD
         const img = await loadImg(photos[i].dataUrl)
         ctx.save(); ctx.shadowColor = 'rgba(30,34,53,0.14)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 4
         rrClip(ctx, px, py, PW, PH, 12); ctx.drawImage(img, px, py, PW, PH); ctx.restore()
@@ -529,19 +510,13 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
         }
       }
 
+      // Footer (title + tagline + date)
       const fy2 = stripH - FOOTER_H
-      const fg2 = ctx.createLinearGradient(0, fy2, stripW, stripH)
-      const [fc12, fc22] = theme.footerBg.includes('#') ? theme.footerBg.match(/#[0-9a-f]{6}/gi)! : ['#EBA8B4', '#C4B5D4']
-      fg2.addColorStop(0, fc12); fg2.addColorStop(1, fc22)
-      ctx.fillStyle = fg2; ctx.fillRect(0, fy2, stripW, FOOTER_H)
-      ctx.fillStyle = footerTextColor; ctx.font = '500 15px sans-serif'; ctx.textAlign = 'center'
-      ctx.fillText("Capture your glowing moments 🌸", stripW / 2, fy2 + 30)
-      ctx.font = '12px sans-serif'; ctx.fillStyle = footerSubTextColor
-      ctx.fillText(new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }).replace(/\//g, '.'), stripW / 2, fy2 + 50)
+      drawFooter(ctx, 0, fy2, stripW, FOOTER_H, false)
     }
 
     return c
-  }, [photos, stripType, theme, headerTextColor, headerSubTextColor, footerTextColor, footerSubTextColor])
+  }, [photos, stripType, theme, stripLabelColor, stripSubColor, roseAccent])
 
   const downloadStrip = useCallback(async () => {
     setDownloading(true)
@@ -605,10 +580,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
             </div>
 
             {isGrid ? (
-              <div className="overflow-hidden rounded-2xl" style={{ border: '1px solid rgba(212,104,122,0.15)', background: theme.bg[0] }}>
-                <div className="flex flex-col items-center justify-center py-2.5 gap-0.5" style={{ background: theme.headerBg }}>
-                  <span className="text-[23px] font-serif font-bold text-base tracking-wide" style={{ color: stripLabelColor }}>LumiBooth</span>
-                </div>
+              <div className="overflow-hidden rounded-2xl" style={{ border: '1px solid rgba(212,104,122,0.15)', background: theme.bg }}>
                 <div className="grid grid-cols-2 gap-2 p-3">
                   {photos.map((p, i) => (
                     <div key={i} onClick={() => setSelectedPhoto(i)}
@@ -637,10 +609,13 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                     </div>
                   ))}
                 </div>
-                <div className="flex flex-col items-center justify-center py-2 gap-0.5" style={{ background: theme.footerBg }}>
-                  <span className="text-[11px] font-medium" style={{ color: stripLabelColor, opacity: 0.9 }}>
-                    Capture your glowing moments 🌸
+                {/* Grid footer */}
+                <div className="flex flex-col items-center justify-center py-2 gap-0.5" style={{ background: theme.bg }}>
+                  <span className="text-[23px] font-serif font-bold tracking-wide">
+                    <em style={{ color: roseAccent, fontStyle: 'italic' }}>Lumi</em>
+                    <span style={{ color: stripLabelColor }}>Booth</span>
                   </span>
+                  <span className="text-[11px] font-medium" style={{ color: stripLabelColor, opacity: 0.9 }}>Capture your glowing moments 🌸</span>
                   <span className="text-[9px]" style={{ color: stripLabelColor, opacity: 0.55 }}>
                     {new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }).replace(/\//g, '.')}
                   </span>
@@ -653,17 +628,15 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                     border: '1px solid rgba(212,104,122,0.15)',
                     background: theme.bg[0],
                     width: '100%',
-                    maxWidth: stripType === 'single' ? '100%' : 320,
+                    maxWidth: stripType === 'single' ? 420 : 320,
                   }}>
-                  <div className="flex flex-col items-center justify-center py-2.5 gap-0.5" style={{ background: theme.headerBg }}>
-                    <span className="text-[23px] font-serif font-bold text-base tracking-wide" style={{ color: stripLabelColor }}>LumiBooth</span>
-                  </div>
                   <div className="flex flex-col gap-2 p-3">
                     {photos.map((p, i) => (
                       <div key={i} onClick={() => setSelectedPhoto(i)}
                         className="relative overflow-hidden rounded-xl cursor-pointer transition-all"
                         style={{
-                          aspectRatio: stripType === 'single' ? '16/9' : slotAspect,
+                          aspectRatio: slotAspect,
+                          ...(stripType === 'single' ? { minHeight: 300 } : {}),
                           width: '100%',
                           border: selectedPhoto === i ? `2px solid var(--rose)` : '2px solid transparent',
                           boxShadow: selectedPhoto === i ? '0 0 0 3px rgba(212,104,122,0.2)' : '0 2px 8px rgba(30,34,53,0.1)',
@@ -691,10 +664,13 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                       </div>
                     ))}
                   </div>
-                  <div className="flex flex-col items-center justify-center py-2 gap-0.5" style={{ background: theme.footerBg }}>
-                    <span className="text-[11px] font-medium" style={{ color: stripLabelColor, opacity: 0.9 }}>
-                      Capture your glowing moments 🌸
+                  {/* Vertical strip footer — matches canvas drawFooter */}
+                  <div className="flex flex-col items-center justify-center mb-2 gap-0.5" style={{ background: theme.bg }}>
+                    <span className="text-[25px] font-serif font-bold tracking-wide">
+                      <em style={{ color: roseAccent, fontStyle: 'italic' }}>Lumi</em>
+                      <span style={{ color: stripLabelColor }}>Booth</span>
                     </span>
+                    <span className="text-[11px] font-medium" style={{ color: stripLabelColor, opacity: 0.9 }}>Capture your glowing moments 🌸</span>
                     <span className="text-[9px]" style={{ color: stripLabelColor, opacity: 0.55 }}>
                       {new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }).replace(/\//g, '.')}
                     </span>
@@ -742,14 +718,13 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                 style={{ background: 'white', border: '1px solid rgba(212,104,122,0.25)', boxShadow: '0 2px 6px rgba(30,34,53,0.1)', color: 'var(--rose)' }}
                 onClick={() => {
                   const el = document.getElementById('theme-carousel-v')
-                  if (el) el.scrollBy({ top: -((el.scrollHeight / Math.ceil(THEMES.length / 3))), behavior: 'smooth' })
+                  if (el) el.scrollBy({ top: -(el.scrollHeight / Math.ceil(THEMES.length / 3)), behavior: 'smooth' })
                 }}
               >︿</button>
-
               <div
                 id="theme-carousel-v"
                 className="overflow-y-auto"
-                style={{ maxHeight: 240, scrollbarWidth: 'none', msOverflowStyle: 'none', scrollBehavior: 'smooth' }}
+                style={{ maxHeight: 210, scrollbarWidth: 'none', msOverflowStyle: 'none', scrollBehavior: 'smooth' }}
               >
                 {Array.from({ length: Math.ceil(THEMES.length / 3) }, (_, rowIdx) => (
                   <div key={rowIdx} className="grid grid-cols-3 gap-2 mb-2">
@@ -759,22 +734,19 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                         className={`theme-card p-0 overflow-hidden ${selectedTheme === t.id ? 'selected' : ''}`}
                         onClick={() => setSelectedTheme(t.id)}
                       >
-                        <div style={{ height: 22, background: t.headerBg }} />
-                        <div style={{ height: 12, background: `linear-gradient(135deg, ${t.bg[0]}, ${t.bg[1]})` }} />
-                        <div style={{ height: 12, background: t.footerBg }} />
+                        <div style={{ height: 46, background: t.bg }} />
                         <p className="text-[9px] font-semibold text-center py-1 leading-none" style={{ color: 'var(--ink)' }}>{t.label}</p>
                       </button>
                     ))}
                   </div>
                 ))}
               </div>
-
               <button
                 className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full w-6 h-5 flex items-center justify-center text-xs font-bold z-10 rounded-full"
                 style={{ background: 'white', border: '1px solid rgba(212,104,122,0.25)', boxShadow: '0 2px 6px rgba(30,34,53,0.1)', color: 'var(--rose)' }}
                 onClick={() => {
                   const el = document.getElementById('theme-carousel-v')
-                  if (el) el.scrollBy({ top: (el.scrollHeight / Math.ceil(THEMES.length / 3)), behavior: 'smooth' })
+                  if (el) el.scrollBy({ top: el.scrollHeight / Math.ceil(THEMES.length / 3), behavior: 'smooth' })
                 }}
               >﹀</button>
             </div>
@@ -785,10 +757,8 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
 
           {/* Actions */}
           <div className="card p-4 flex flex-row gap-3 anim-fade" style={{ animationDelay: '0.3s' }}>
-            <button className="btn btn-outline flex-1 py-3.5 text-sm" onClick={onRetake}>
-              🔄 Retake
-            </button>
-            <button className="btn btn-primary flex-1 py-3.5 text-sm" onClick={downloadStrip} disabled={downloading}>
+            <button className="btn btn-outline flex-1 py-3 text-sm" onClick={onRetake}>🔄 Retake</button>
+            <button className="btn btn-primary flex-1 py-3 text-sm" onClick={downloadStrip} disabled={downloading}>
               {downloading ? <><span className="spin-anim inline-block">✨</span> Saving…</> : <>💾 Download</>}
             </button>
           </div>
