@@ -161,25 +161,11 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
   // Per-strip aspect ratio for preview slots
   const photoAspect: Record<StripType, string> = {
     single: '4/4',
-    strip3: '2/2',
-    strip4: '2/2',
+    strip3: '2/1.27',
+    strip4: '2.15/1.01',
     grid2x2: '4/3',
   }
   const slotAspect = photoAspect[stripType]
-
-  // Shared filter chips — rendered in two places (mobile & desktop)
-  const FilterChips = () => (
-    <>
-      <p className="text-xs font-semibold mb-3 tracking-wide uppercase" style={{ color: 'var(--muted)' }}>Filter</p>
-      <div className="flex flex-wrap gap-2">
-        {FILTERS.map(f => (
-          <button key={f.id} className={`chip ${filter === f.id ? 'active' : ''}`} onClick={() => setFilter(f.id)}>
-            {f.label}
-          </button>
-        ))}
-      </div>
-    </>
-  )
 
   return (
     <div className="bg-lumi min-h-screen flex flex-col">
@@ -313,20 +299,10 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
                 </button>
               </div>
             </div>
-
-            {/* Filter — mobile only (below shoot button, hidden on lg) */}
-            <div className="lg:hidden card p-4 anim-fade" style={{ animationDelay: '0.25s' }}>
-              <FilterChips />
-            </div>
           </div>
 
           {/* Right col: filter (desktop) + strip preview */}
           <div className={`flex flex-col gap-4 ${stripType === 'single' ? 'lg:w-96' : 'lg:w-72'}`}>
-
-            {/* Filter — desktop only (inline with viewport, hidden on mobile) */}
-            <div className="hidden lg:block card p-4 anim-fade" style={{ animationDelay: '0.2s' }}>
-              <FilterChips />
-            </div>
 
             {/* Strip preview */}
             <div className="card p-4 anim-fade" style={{ animationDelay: '0.3s' }}>
@@ -386,7 +362,7 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
               )}
 
               <p className="text-[10px] text-center mt-3" style={{ color: 'var(--muted)', letterSpacing: '0.05em' }}>
-                {photos.length === 0 ? 'Your photos will appear here'
+                {photos.length === 0 ? stripType === 'single' ? 'Your photo will appear here.' : 'Your photos will appear here.'
                   : photos.length === needed ? 'All shots captured! ✨'
                     : `${needed - photos.length} more to go`}
               </p>
