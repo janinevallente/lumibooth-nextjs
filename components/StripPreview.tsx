@@ -1,26 +1,28 @@
 import { StripType } from './Commons'
+import './Components.css'
 
 function Slot({ w, h, r = 6 }: { w: number; h: number; r?: number }) {
     return (
-        <div style={{
-            width: w, height: h, borderRadius: r,
-            background: 'linear-gradient(135deg, #F5D5DB 0%, #E8D5F0 100%)',
-            border: '1.5px solid rgba(212,104,122,0.25)',
-            flexShrink: 0,
-        }} />
+        <div
+            className="strip-slot"
+            style={{ width: w, height: h, borderRadius: r, }}
+        />
     )
 }
 
 export default function StripPreview({ type }: { type: StripType }) {
     if (type === 'single') return (
-        <div className="flex items-center justify-center" style={{ height: 120 }}>
+        <div className="strip-preview-wrapper">
             <Slot w={100} h={120} />
         </div>
     )
 
     if (type === 'strip3') return (
-        <div className="flex items-center justify-center" style={{ height: 120 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5, padding: '6px 10px', background: 'rgba(255,255,255,0.6)', borderRadius: 8, border: '1px solid rgba(212,104,122,0.15)' }}>
+        <div className="strip-preview-wrapper">
+            <div
+                className="strip-inner strip-inner-col"
+                style={{ '--gap': '5px' } as React.CSSProperties}
+            >
                 <Slot w={37} h={33} />
                 <Slot w={37} h={33} />
                 <Slot w={37} h={33} />
@@ -29,8 +31,11 @@ export default function StripPreview({ type }: { type: StripType }) {
     )
 
     if (type === 'strip4') return (
-        <div className="flex items-center justify-center" style={{ height: 120 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '6px 10px', background: 'rgba(255,255,255,0.6)', borderRadius: 8, border: '1px solid rgba(212,104,122,0.15)' }}>
+        <div className="strip-preview-wrapper">
+            <div
+                className="strip-inner strip-inner-col"
+                style={{ '--gap': '4px' } as React.CSSProperties}
+            >
                 <Slot w={29} h={24} />
                 <Slot w={29} h={24} />
                 <Slot w={29} h={24} />
@@ -41,8 +46,8 @@ export default function StripPreview({ type }: { type: StripType }) {
 
     // grid 2x2
     return (
-        <div className="flex items-center justify-center" style={{ height: 120 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5, padding: '8px', background: 'rgba(255,255,255,0.6)', borderRadius: 10, border: '1px solid rgba(212,104,122,0.15)' }}>
+        <div className="strip-preview-wrapper">
+            <div className="strip-inner strip-inner-grid">
                 <Slot w={54} h={46} />
                 <Slot w={54} h={46} />
                 <Slot w={54} h={46} />
