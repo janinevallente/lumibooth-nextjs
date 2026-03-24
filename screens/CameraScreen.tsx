@@ -3,10 +3,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { StripType, FilterId, PhotoEntry, Sticker, FILTERS, SHOTS_NEEDED } from '../components/Commons'
 
-// Re-export so other files (ReviewScreen) importing from CameraScreen still work
-// export type { FilterId, PhotoEntry, Sticker }
-// export { FILTERS }
-
 interface Props {
   stripType: StripType
   onComplete: (photos: PhotoEntry[]) => void
@@ -198,9 +194,13 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
           <div className="flex-1 flex flex-col gap-4">
             <div className="card anim-scale overflow-hidden" style={{ animationDelay: '0.15s' }}>
               {/* Viewport */}
-              <div className="relative overflow-hidden"
-                style={{ aspectRatio: '4/3', borderRadius: 18, background: 'linear-gradient(135deg, #1E2235, #2A3050)' }}>
-
+              <div
+                className="relative overflow-hidden aspect-[2.5/3] md:aspect-[3.5/3] lg:aspect-[4/3]"
+                style={{
+                  borderRadius: 18,
+                  background: 'linear-gradient(135deg, #1E2235, #2A3050)'
+                }}
+              >
                 {cameraError ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8 text-center">
                     <span style={{ fontSize: 52 }}>🌸</span>
