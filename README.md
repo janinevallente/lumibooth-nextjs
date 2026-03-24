@@ -47,20 +47,6 @@ Pick from 4 layouts:
 - 🌸 Petal burst celebration after shooting
 - 📱 Fully responsive — desktop, tablet, and mobile
 
-## Project Structure
-
-```
-app/
-  layout.tsx        # Root layout & fonts
-  page.tsx          # Step orchestrator (landing → strip select → camera → review)
-  globals.css       # Theme variables, animations, utility classes
-components/
-  Landing.tsx       # Step 0: landing page with Get Started
-  StripSelector.tsx # Step 1: choose strip format
-  CameraScreen.tsx  # Step 2: camera, countdown, filter, preview
-  ReviewScreen.tsx  # Step 3: stickers, themes, download
-```
-
 ## Tech Stack
 
 - **Next.js 14** (App Router)
