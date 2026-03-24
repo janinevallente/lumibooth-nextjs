@@ -1,0 +1,60 @@
+/* ─── PrivacyModal ─────────────────────────────────────────────────────────── */
+.privacy-backdrop {
+    background: rgba(30, 34, 53, 0.55);
+    backdrop-filter: blur(8px);
+}
+
+.privacy-card {
+    background: white;
+    box-shadow: 0 24px 64px rgba(30, 34, 53, 0.22);
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.privacy-header {
+    border-bottom: 1px solid rgba(212, 104, 122, 0.12);
+}
+
+.privacy-title {
+    font-size: 18px;
+    color: var(--navy);
+}
+
+.privacy-close-btn {
+    width: 30px;
+    height: 30px;
+    background: rgba(212, 104, 122, 0.1);
+    color: var(--rose);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.privacy-body {
+    color: var(--ink);
+    scrollbar-width: none;
+}
+
+.privacy-date {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.privacy-footer {
+    border-top: 1px solid rgba(212, 104, 122, 0.12);
+}
+
+/* ─── Section (used inside PrivacyModal) ───────────────────────────────────── */
+.section-emoji {
+    font-size: 15px;
+}
+
+.section-title {
+    color: var(--navy);
+}
+
+.section-body {
+    color: var(--ink);
+    font-size: 13px;
+    line-height: 1.65;
+}

@@ -1,13 +1,15 @@
 'use client'
 
+import './Components.css'
+
 function Section({ emoji, title, children }: { emoji: string; title: string; children: React.ReactNode }) {
     return (
         <div className="mb-5">
             <div className="flex items-center gap-2 mb-1.5">
-                <span style={{ fontSize: 15 }}>{emoji}</span>
-                <h3 className="font-semibold text-sm" style={{ color: 'var(--navy)' }}>{title}</h3>
+                <span className="section-emoji">{emoji}</span>
+                <h3 className="font-semibold text-sm section-title">{title}</h3>
             </div>
-            <p style={{ color: 'var(--ink)', fontSize: 13, lineHeight: 1.65 }}>{children}</p>
+            <p className="section-body">{children}</p>
         </div>
     )
 }
@@ -19,30 +21,25 @@ interface Props {
 export default function PrivacyModal({ onClose }: Props) {
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center px-4"
-            style={{ background: 'rgba(30,34,53,0.55)', backdropFilter: 'blur(8px)' }}>
-            <div
-                className="relative w-full max-w-lg rounded-3xl overflow-hidden anim-scale"
-                style={{ background: 'white', boxShadow: '0 24px 64px rgba(30,34,53,0.22)', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+            className="fixed inset-0 z-50 flex items-center justify-center px-4 privacy-backdrop">
+            <div className="relative w-full max-w-lg rounded-3xl overflow-hidden anim-scale privacy-card">
 
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 pt-6 pb-4 flex-shrink-0"
-                    style={{ borderBottom: '1px solid rgba(212,104,122,0.12)' }}>
-                    <h2 className="font-serif font-bold" style={{ fontSize: 18, color: 'var(--navy)' }}>
+                <div className="flex items-center justify-between px-6 pt-6 pb-4 flex-shrink-0 privacy-header">
+                    <h2 className="font-serif font-bold privacy-title">
                         Data Privacy Policy
                     </h2>
                     <button
                         onClick={onClose}
-                        className="flex items-center justify-center rounded-full transition-all hover:scale-110"
-                        style={{ width: 30, height: 30, background: 'rgba(212,104,122,0.1)', color: 'var(--rose)', fontSize: 14, fontWeight: 700 }}>
+                        className="flex items-center justify-center rounded-full transition-all hover:scale-110 privacy-close-btn">
                         ✕
                     </button>
                 </div>
 
                 {/* Body — scrollable */}
-                <div className="overflow-y-auto px-6 py-5 text-sm leading-relaxed" style={{ color: 'var(--ink)', scrollbarWidth: 'none' }}>
+                <div className="overflow-y-auto px-6 py-5 text-sm leading-relaxed privacy-body">
 
-                    <p className="mb-4" style={{ color: 'var(--muted)', fontSize: 12 }}>
+                    <p className="mb-4 privacy-date">
                         Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                     </p>
 
@@ -80,7 +77,7 @@ export default function PrivacyModal({ onClose }: Props) {
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-4 flex-shrink-0" style={{ borderTop: '1px solid rgba(212,104,122,0.12)' }}>
+                <div className="px-6 py-4 flex-shrink-0 privacy-footer">
                     <button onClick={onClose} className="btn btn-primary w-full py-3 text-sm">
                         I understand
                     </button>
