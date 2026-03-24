@@ -20,8 +20,7 @@ interface Props {
 
 export default function PrivacyModal({ onClose }: Props) {
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center px-4 privacy-backdrop">
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 privacy-backdrop">
             <div className="relative w-full max-w-lg rounded-3xl overflow-hidden anim-scale privacy-card">
 
                 {/* Header */}
