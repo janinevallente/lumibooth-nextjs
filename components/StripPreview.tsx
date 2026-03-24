@@ -13,40 +13,40 @@ function Slot({ w, h, r = 6 }: { w: number; h: number; r?: number }) {
 
 export default function StripPreview({ type }: { type: StripType }) {
     if (type === 'single') return (
-        <div className="flex items-center justify-center" style={{ height: 100 }}>
-            <Slot w={90} h={68} />
+        <div className="flex items-center justify-center" style={{ height: 120 }}>
+            <Slot w={100} h={120} />
         </div>
     )
 
     if (type === 'strip3') return (
-        <div className="flex items-center justify-center" style={{ height: 100 }}>
+        <div className="flex items-center justify-center" style={{ height: 120 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5, padding: '6px 10px', background: 'rgba(255,255,255,0.6)', borderRadius: 8, border: '1px solid rgba(212,104,122,0.15)' }}>
-                <Slot w={64} h={26} />
-                <Slot w={64} h={26} />
-                <Slot w={64} h={26} />
+                <Slot w={37} h={33} />
+                <Slot w={37} h={33} />
+                <Slot w={37} h={33} />
             </div>
         </div>
     )
 
     if (type === 'strip4') return (
-        <div className="flex items-center justify-center" style={{ height: 100 }}>
+        <div className="flex items-center justify-center" style={{ height: 120 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '6px 10px', background: 'rgba(255,255,255,0.6)', borderRadius: 8, border: '1px solid rgba(212,104,122,0.15)' }}>
-                <Slot w={64} h={18} />
-                <Slot w={64} h={18} />
-                <Slot w={64} h={18} />
-                <Slot w={64} h={18} />
+                <Slot w={29} h={24} />
+                <Slot w={29} h={24} />
+                <Slot w={29} h={24} />
+                <Slot w={29} h={24} />
             </div>
         </div>
     )
 
     // grid 2x2
     return (
-        <div className="flex items-center justify-center" style={{ height: 100 }}>
+        <div className="flex items-center justify-center" style={{ height: 120 }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5, padding: '8px', background: 'rgba(255,255,255,0.6)', borderRadius: 10, border: '1px solid rgba(212,104,122,0.15)' }}>
-                <Slot w={44} h={36} />
-                <Slot w={44} h={36} />
-                <Slot w={44} h={36} />
-                <Slot w={44} h={36} />
+                <Slot w={54} h={46} />
+                <Slot w={54} h={46} />
+                <Slot w={54} h={46} />
+                <Slot w={54} h={46} />
             </div>
         </div>
     )
