@@ -1,71 +1,9 @@
 'use client'
 
-export type StripType = 'single' | 'strip3' | 'strip4' | 'grid2x2'
+import { StripType, STRIP_OPTIONS } from '../components/Commons'
+import StripPreview from '../components/StripPreview'
+export type { StripType }
 
-interface StripOption {
-  id: StripType
-  label: string
-  desc: string
-  count: number
-  preview: React.ReactNode
-}
-
-function StripPreview({ type }: { type: StripType }) {
-  const slot = (w: number, h: number, r = 6) => (
-    <div style={{
-      width: w, height: h, borderRadius: r,
-      background: 'linear-gradient(135deg, #F5D5DB 0%, #E8D5F0 100%)',
-      border: '1.5px solid rgba(212,104,122,0.25)',
-      flexShrink: 0,
-    }} />
-  )
-
-  if (type === 'single') return (
-    <div className="flex items-center justify-center" style={{ height: 120 }}>
-      {slot(100, 120)}
-    </div>
-  )
-
-  if (type === 'strip3') return (
-    <div className="flex items-center justify-center" style={{ height: 120 }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '8px 6px', background: 'rgba(255,255,255,0.6)', borderRadius: 8, border: '1px solid rgba(212,104,122,0.15)' }}>
-        {slot(37, 33)}
-        {slot(37, 33)}
-        {slot(37, 33)}
-      </div>
-    </div>
-  )
-
-  if (type === 'strip4') return (
-    <div className="flex items-center justify-center" style={{ height: 120 }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 5, padding: '8px 6px', background: 'rgba(255,255,255,0.6)', borderRadius: 8, border: '1px solid rgba(212,104,122,0.15)' }}>
-        {slot(29, 24)}
-        {slot(29, 24)}
-        {slot(29, 24)}
-        {slot(29, 24)}
-      </div>
-    </div>
-  )
-
-  // grid 2x2
-  return (
-    <div className="flex items-center justify-center" style={{ height: 120 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, padding: '10px', background: 'rgba(255,255,255,0.6)', borderRadius: 10, border: '1px solid rgba(212,104,122,0.15)' }}>
-        {slot(54, 46)}
-        {slot(54, 46)}
-        {slot(54, 46)}
-        {slot(54, 46)}
-      </div>
-    </div>
-  )
-}
-
-const OPTIONS: { id: StripType; label: string; desc: string; shots: number; tag?: string }[] = [
-  { id: 'single', label: 'Single', desc: '1 perfect shot', shots: 1 },
-  { id: 'strip3', label: '3 Strip', desc: '3 photos, tall strip', shots: 3 },
-  { id: 'strip4', label: '4 Strip', desc: '4 photos, classic booth', shots: 4, tag: 'Popular' },
-  { id: 'grid2x2', label: '2 × 2', desc: '4 photos in a square grid', shots: 4 },
-]
 
 interface Props {
   selected: StripType | null
@@ -104,7 +42,7 @@ export default function StripSelector({ selected, onSelect, onNext, onBack }: Pr
 
       {/* Options grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto w-full anim-scale" style={{ animationDelay: '0.2s' }}>
-        {OPTIONS.map(opt => (
+        {STRIP_OPTIONS.map(opt => (
           <button
             key={opt.id}
             className={`strip-card relative ${selected === opt.id ? 'selected' : ''}`}
