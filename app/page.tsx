@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import Landing from '@/screens/Landing/Landing'
-import StripSelector, { StripType } from '@/screens/StripSelector/StripSelector'
-import CameraScreen, { PhotoEntry } from '@/screens/CameraScreen'
+import StripSelector from '@/screens/StripSelector/StripSelector'
+import CameraScreen from '@/screens/CameraScreen'
 import ReviewScreen from '@/screens/ReviewScreen'
+import { StripType, PhotoEntry } from '@/components/Commons'
 
 type Step = 'landing' | 'strip-select' | 'camera' | 'review'
 

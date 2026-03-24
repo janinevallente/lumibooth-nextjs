@@ -3,7 +3,6 @@
 import { StripType, STRIP_OPTIONS } from '../../components/Commons'
 import StripPreview from '../../components/StripPreview'
 import './StripSelector.css'
-export type { StripType }
 
 interface Props {
   selected: StripType | null
