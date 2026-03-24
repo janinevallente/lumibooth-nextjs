@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useCallback } from 'react'
-import { PhotoEntry, Sticker, FILTERS, FilterId } from './CameraScreen'
+import { PhotoEntry, Sticker, FILTERS, FilterId } from '../components/Commons'
 import { StripType } from './StripSelector/StripSelector'
 
 // ─── Strip design themes ──────────────────────────────────────────────────────

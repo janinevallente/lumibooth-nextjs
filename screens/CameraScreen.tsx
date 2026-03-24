@@ -1,39 +1,11 @@
 'use client'
 
 import { useRef, useState, useCallback, useEffect } from 'react'
-import { StripType } from './StripSelector/StripSelector'
+import { StripType, FilterId, PhotoEntry, Sticker, FILTERS, SHOTS_NEEDED } from '../components/Commons'
 
-export type FilterId = 'none' | 'soft' | 'bloom' | 'bw' | 'cool' | 'warm' | 'film' | 'vivid'
-
-export interface PhotoEntry {
-  dataUrl: string
-  filter: FilterId
-  stickers: Sticker[]
-}
-
-export interface Sticker {
-  id: string
-  emoji: string
-  x: number
-  y: number
-  size: number
-  rotation: number
-}
-
-export const FILTERS: { id: FilterId; label: string; css: string; accent: string }[] = [
-  { id: 'none', label: 'Natural', css: 'none', accent: '#D4687A' },
-  { id: 'soft', label: 'Soft', css: 'brightness(1.08) saturate(0.82) contrast(0.91)', accent: '#C4B5D4' },
-  { id: 'bloom', label: 'Bloom', css: 'brightness(1.12) saturate(1.1) contrast(0.88) sepia(0.07)', accent: '#EBA8B4' },
-  { id: 'bw', label: 'Mono', css: 'grayscale(100%) contrast(1.12)', accent: '#666' },
-  { id: 'cool', label: 'Azure', css: 'hue-rotate(18deg) saturate(1.18) brightness(1.04)', accent: '#7EC8E3' },
-  { id: 'warm', label: 'Honey', css: 'sepia(20%) saturate(1.32) brightness(1.06)', accent: '#C9A96E' },
-  { id: 'film', label: 'Film', css: 'sepia(28%) contrast(1.18) brightness(0.95) saturate(0.88)', accent: '#9BB5A0' },
-  { id: 'vivid', label: 'Vivid', css: 'saturate(1.65) contrast(1.08)', accent: '#EBA8B4' },
-]
-
-const SHOTS_NEEDED: Record<StripType, number> = {
-  single: 1, strip3: 3, strip4: 4, grid2x2: 4,
-}
+// Re-export so other files (ReviewScreen) importing from CameraScreen still work
+// export type { FilterId, PhotoEntry, Sticker }
+// export { FILTERS }
 
 interface Props {
   stripType: StripType
@@ -301,7 +273,7 @@ export default function CameraScreen({ stripType, onComplete, onBack }: Props) {
             </div>
           </div>
 
-          {/* Right col: filter (desktop) + strip preview */}
+          {/* Right col: strip preview */}
           <div className={`flex flex-col gap-4 ${stripType === 'single' ? 'lg:w-96' : 'lg:w-72'}`}>
 
             {/* Strip preview */}
