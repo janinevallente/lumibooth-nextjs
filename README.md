@@ -54,7 +54,7 @@ app/
   layout.tsx        # Root layout & fonts
   page.tsx          # Step orchestrator (landing → strip select → camera → review)
   globals.css       # Theme variables, animations, utility classes
-pages/
+components/
   Landing.tsx       # Step 0: landing page with Get Started
   StripSelector.tsx # Step 1: choose strip format
   CameraScreen.tsx  # Step 2: camera, countdown, filter, preview
