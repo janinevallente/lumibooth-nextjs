@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import Landing from '@/components/Landing'
-import StripSelector, { StripType } from '@/components/StripSelector'
-import CameraScreen, { PhotoEntry } from '@/components/CameraScreen'
-import ReviewScreen from '@/components/ReviewScreen'
+import Landing from '@/pages/Landing'
+import StripSelector, { StripType } from '@/pages/StripSelector'
+import CameraScreen, { PhotoEntry } from '@/pages/CameraScreen'
+import ReviewScreen from '@/pages/ReviewScreen'
 
 type Step = 'landing' | 'strip-select' | 'camera' | 'review'
 
