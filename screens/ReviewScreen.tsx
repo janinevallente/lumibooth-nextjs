@@ -2,7 +2,7 @@
 
 import { useRef, useState, useCallback } from 'react'
 import { PhotoEntry, Sticker, FILTERS, FilterId } from './CameraScreen'
-import { StripType } from './StripSelector'
+import { StripType } from './StripSelector/StripSelector'
 
 // ─── Strip design themes ──────────────────────────────────────────────────────
 

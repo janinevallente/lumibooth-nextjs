@@ -1,0 +1,47 @@
+.ss-title-section {
+    animation-delay: 0.1s;
+}
+
+.ss-step-label {
+    color: var(--rose);
+}
+
+.ss-headline {
+    font-size: clamp(32px, 6vw, 52px);
+    font-weight: 300;
+    color: var(--navy);
+    line-height: 1.1;
+}
+
+.ss-headline em {
+    color: var(--rose);
+}
+
+.ss-subtitle {
+    color: var(--muted);
+}
+
+.ss-grid {
+    animation-delay: 0.2s;
+}
+
+.ss-tag {
+    background: linear-gradient(90deg, var(--rose), var(--blush));
+    white-space: nowrap;
+}
+
+.ss-option-label {
+    color: var(--navy);
+}
+
+.ss-option-desc {
+    color: var(--muted);
+}
+
+.ss-checkmark {
+    background: var(--rose);
+}
+
+.ss-next-row {
+    animation-delay: 0.35s;
+}

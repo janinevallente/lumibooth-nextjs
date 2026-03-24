@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Landing from '@/screens/Landing/Landing'
-import StripSelector, { StripType } from '@/screens/StripSelector'
+import StripSelector, { StripType } from '@/screens/StripSelector/StripSelector'
 import CameraScreen, { PhotoEntry } from '@/screens/CameraScreen'
 import ReviewScreen from '@/screens/ReviewScreen'
 

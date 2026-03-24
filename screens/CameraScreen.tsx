@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useCallback, useEffect } from 'react'
-import { StripType } from './StripSelector'
+import { StripType } from './StripSelector/StripSelector'
 
 export type FilterId = 'none' | 'soft' | 'bloom' | 'bw' | 'cool' | 'warm' | 'film' | 'vivid'
 
