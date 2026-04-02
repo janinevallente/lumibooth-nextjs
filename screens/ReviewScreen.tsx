@@ -166,28 +166,43 @@ function drawImageCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, dx
 //   2. try/catch handles SecurityError from canvas tainting
 //   3. length check detects a blank/empty toDataURL result
 async function applyFilterToDataUrl(dataUrl: string, css: string): Promise<string> {
-  if (css === 'none') return dataUrl
+  if (!css || css === 'none') return dataUrl;
+
   return new Promise((resolve) => {
-    const img = new Image()
+    const img = new Image();
+    // Prevent potential tainting issues on mobile
+    img.crossOrigin = "anonymous";
+
     img.onload = () => {
-      try {
-        const c = document.createElement('canvas')
-        c.width = img.naturalWidth
-        c.height = img.naturalHeight
-        const ctx = c.getContext('2d', { willReadFrequently: true })!
-        ctx.filter = css
-        ctx.drawImage(img, 0, 0)
-        const result = c.toDataURL('image/jpeg', 0.93)
-        // If result is suspiciously small (blank canvas), fall back to original
-        resolve(result.length > 1000 ? result : dataUrl)
-      } catch {
-        // SecurityError or other canvas failure — use original
-        resolve(dataUrl)
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      const ctx = c.getContext('2d');
+
+      if (!ctx) {
+        resolve(dataUrl);
+        return;
       }
-    }
-    img.onerror = () => resolve(dataUrl)
-    img.src = dataUrl
-  })
+      // Set the filter FIRST
+      ctx.filter = css;
+      // Draw the image
+      ctx.drawImage(img, 0, 0);
+      // Mobile Hack: On iOS/Android, we need a tiny delay to let the 
+      // GPU finish the filter rasterization before calling toDataURL.
+      setTimeout(() => {
+        try {
+          const result = c.toDataURL('image/jpeg', 0.92);
+          // If the filter failed to apply, result might be too small/empty
+          resolve(result.length > 100 ? result : dataUrl);
+        } catch (err) {
+          console.error("Filter export failed:", err);
+          resolve(dataUrl);
+        }
+      }, 40); // 40ms is usually enough for a 60fps frame cycle
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
 }
 
 // ─── Petal burst ─────────────────────────────────────────────────────────────
@@ -282,72 +297,135 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
 
   // ── Build canvas ──────────────────────────────────────────────────────────
   const buildCanvas = useCallback(async (): Promise<HTMLCanvasElement> => {
-    const PW = 640, PH = 480, PAD = 24, GAP = 14, FOOTER_H = 110
-    let c: HTMLCanvasElement, ctx: CanvasRenderingContext2D
+    const PW = 640, PH = 480, PAD = 24, GAP = 14, FOOTER_H = 110;
+
+    // 1. Process all filters in parallel first. 
+    // This is much faster on mobile than doing it one-by-one in the loop.
+    const filteredImageUrls = await Promise.all(
+      photos.map(p => applyFilterToDataUrl(p.dataUrl, globalFilterCss))
+    );
+
+    let c: HTMLCanvasElement, ctx: CanvasRenderingContext2D;
 
     if (stripType === 'grid2x2') {
-      const cols = 2
-      const totalW = PW * cols + PAD * (cols + 1)
-      const totalH = PAD + PH + GAP + PH + PAD + FOOTER_H
-      c = document.createElement('canvas'); c.width = totalW; c.height = totalH
-      ctx = c.getContext('2d')!
-      ctx.fillStyle = theme.bg; ctx.fillRect(0, 0, totalW, totalH)
+      const cols = 2;
+      const totalW = PW * cols + PAD * (cols + 1);
+      const totalH = PAD + PH + GAP + PH + PAD + FOOTER_H;
+      c = document.createElement('canvas');
+      c.width = totalW;
+      c.height = totalH;
+      ctx = c.getContext('2d')!;
+      ctx.fillStyle = theme.bg;
+      ctx.fillRect(0, 0, totalW, totalH);
 
-      const positions = [[PAD, PAD], [PW + PAD * 2, PAD], [PAD, PAD + PH + GAP], [PW + PAD * 2, PAD + PH + GAP]]
+      const positions = [
+        [PAD, PAD],
+        [PW + PAD * 2, PAD],
+        [PAD, PAD + PH + GAP],
+        [PW + PAD * 2, PAD + PH + GAP]
+      ];
+
       for (let i = 0; i < Math.min(photos.length, 4); i++) {
-        const [px, py] = positions[i]
-        const filteredUrl = await applyFilterToDataUrl(photos[i].dataUrl, globalFilterCss)
-        const img = await loadImg(filteredUrl)
-        ctx.save(); ctx.shadowColor = 'rgba(30,34,53,0.15)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4
-        rrClip(ctx, px, py, PW, PH, 12); drawImageCover(ctx, img, px, py, PW, PH); ctx.restore()
-        ctx.strokeStyle = theme.borderColor; ctx.lineWidth = 2; rrStroke(ctx, px, py, PW, PH, 12)
+        const [px, py] = positions[i];
+        // Use the pre-filtered URL
+        const img = await loadImg(filteredImageUrls[i]);
+
+        ctx.save();
+        ctx.shadowColor = 'rgba(30,34,53,0.15)';
+        ctx.shadowBlur = 12;
+        ctx.shadowOffsetY = 4;
+        rrClip(ctx, px, py, PW, PH, 12);
+        drawImageCover(ctx, img, px, py, PW, PH);
+        ctx.restore();
+
+        ctx.strokeStyle = theme.borderColor;
+        ctx.lineWidth = 2;
+        rrStroke(ctx, px, py, PW, PH, 12);
+
+        // Draw Stickers
         for (const s of photos[i].stickers) {
-          const sx = px + (s.x / 100) * PW, sy = py + (s.y / 100) * PH
-          ctx.save(); ctx.translate(sx, sy); ctx.rotate(s.rotation * Math.PI / 180)
-          ctx.font = `${s.size}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-          ctx.fillText(s.emoji, 0, 0); ctx.restore()
+          const sx = px + (s.x / 100) * PW, sy = py + (s.y / 100) * PH;
+          ctx.save();
+          ctx.translate(sx, sy);
+          ctx.rotate(s.rotation * Math.PI / 180);
+          ctx.font = `${s.size}px serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(s.emoji, 0, 0);
+          ctx.restore();
         }
       }
-      drawFooter(ctx, 0, totalH - FOOTER_H, totalW, FOOTER_H)
+      drawFooter(ctx, 0, totalH - FOOTER_H, totalW, FOOTER_H);
+
     } else {
-      const aspectMap: Record<string, number> = { single: 5 / 4, strip3: 1, strip4: 1 }
-      const photoH = Math.round(PW * (aspectMap[stripType] ?? 1))
-      const stripW = PW + PAD * 2
-      const n = photos.length
-      const stripH = PAD + (photoH + GAP) * n - GAP + PAD + FOOTER_H
-      c = document.createElement('canvas'); c.width = stripW; c.height = stripH
-      ctx = c.getContext('2d')!
-      ctx.fillStyle = theme.bg; ctx.fillRect(0, 0, stripW, stripH)
+      // Strip Logic (Vertical)
+      const aspectMap: Record<string, number> = { single: 5 / 4, strip3: 1, strip4: 1 };
+      const photoH = Math.round(PW * (aspectMap[stripType] ?? 1));
+      const stripW = PW + PAD * 2;
+      const n = photos.length;
+      const stripH = PAD + (photoH + GAP) * n - GAP + PAD + FOOTER_H;
+
+      c = document.createElement('canvas');
+      c.width = stripW;
+      c.height = stripH;
+      ctx = c.getContext('2d')!;
+      ctx.fillStyle = theme.bg;
+      ctx.fillRect(0, 0, stripW, stripH);
 
       for (let i = 0; i < photos.length; i++) {
-        const py = PAD + i * (photoH + GAP), px = PAD
-        const filteredUrl = await applyFilterToDataUrl(photos[i].dataUrl, globalFilterCss)
-        const img = await loadImg(filteredUrl)
-        ctx.save(); ctx.shadowColor = 'rgba(30,34,53,0.14)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 4
-        rrClip(ctx, px, py, PW, photoH, 12); drawImageCover(ctx, img, px, py, PW, photoH); ctx.restore()
-        ctx.strokeStyle = theme.borderColor; ctx.lineWidth = 2; rrStroke(ctx, px, py, PW, photoH, 12)
+        const py = PAD + i * (photoH + GAP), px = PAD;
+        // Use the pre-filtered URL
+        const img = await loadImg(filteredImageUrls[i]);
+
+        ctx.save();
+        ctx.shadowColor = 'rgba(30,34,53,0.14)';
+        ctx.shadowBlur = 14;
+        ctx.shadowOffsetY = 4;
+        rrClip(ctx, px, py, PW, photoH, 12);
+        drawImageCover(ctx, img, px, py, PW, photoH);
+        ctx.restore();
+
+        ctx.strokeStyle = theme.borderColor;
+        ctx.lineWidth = 2;
+        rrStroke(ctx, px, py, PW, photoH, 12);
+
         for (const s of photos[i].stickers) {
-          const sx = px + (s.x / 100) * PW, sy = py + (s.y / 100) * photoH
-          ctx.save(); ctx.translate(sx, sy); ctx.rotate(s.rotation * Math.PI / 180)
-          ctx.font = `${s.size}px serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-          ctx.fillText(s.emoji, 0, 0); ctx.restore()
+          const sx = px + (s.x / 100) * PW, sy = py + (s.y / 100) * photoH;
+          ctx.save();
+          ctx.translate(sx, sy);
+          ctx.rotate(s.rotation * Math.PI / 180);
+          ctx.font = `${s.size}px serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(s.emoji, 0, 0);
+          ctx.restore();
         }
       }
-      drawFooter(ctx, 0, stripH - FOOTER_H, stripW, FOOTER_H)
+      drawFooter(ctx, 0, stripH - FOOTER_H, stripW, FOOTER_H);
     }
-    return c
-  }, [photos, stripType, theme, stripLabelColor, stripSubColor, roseAccent, globalFilterCss])
+    return c;
+  }, [photos, stripType, theme, globalFilterCss]);
 
   const downloadStrip = useCallback(async () => {
-    setDownloading(true)
+    setDownloading(true);
     try {
-      const c = await buildCanvas()
-      const a = document.createElement('a')
-      a.href = c.toDataURL('image/jpeg', 0.95)
-      a.download = `lumibooth-${Date.now()}.jpg`
-      a.click()
-    } finally { setDownloading(false) }
-  }, [buildCanvas])
+      const c = await buildCanvas();
+      // Slightly lower quality (0.92) helps mobile browsers handle the memory 
+      // export of large canvases without crashing the tab.
+      const dataUrl = c.toDataURL('image/jpeg', 0.92);
+
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `lumibooth-${Date.now()}.jpg`;
+      document.body.appendChild(a); // Required for some mobile browsers
+      a.click();
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error("Download failed", err);
+    } finally {
+      setDownloading(false);
+    }
+  }, [buildCanvas]);
 
   const isGrid = stripType === 'grid2x2'
   const photoAspect: Record<string, string> = { single: '4/5', strip3: '2/2', strip4: '2/2', grid2x2: '4/3' }
