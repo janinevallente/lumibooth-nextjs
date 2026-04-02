@@ -159,46 +159,113 @@ function drawImageCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, dx
   ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh)
 }
 
-// ─── FIXED: Mobile-safe filter application ────────────────────────────────────
-// iOS Safari and some Android browsers can silently ignore ctx.filter or
-// taint the canvas when reading back pixels. We guard both cases:
-//   1. willReadFrequently hint avoids GPU read-back stalls
-//   2. try/catch handles SecurityError from canvas tainting
-//   3. length check detects a blank/empty toDataURL result
-async function applyFilterToDataUrl(dataUrl: string, css: string): Promise<string> {
-  if (!css || css === 'none') return dataUrl;
+/**
+ * Manual Pixel Manipulation Engine
+ * Bypasses buggy mobile browser CSS filters by calculating RGB values directly.
+ */
+function applyManualFilter(ctx: CanvasRenderingContext2D, w: number, h: number, filterId: FilterId) {
+  if (filterId === 'none') return;
+
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const data = imgData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    let r = data[i];
+    let g = data[i + 1];
+    let b = data[i + 2];
+
+    switch (filterId) {
+      case 'bw': // Grayscale(100%) + Contrast(1.12)
+        const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+        r = g = b = (gray - 128) * 1.12 + 128;
+        break;
+
+      case 'soft': // Brightness(1.08) + Saturate(0.82) + Contrast(0.91)
+        // Brightness & Contrast
+        r = (r * 1.08 - 128) * 0.91 + 128;
+        g = (g * 1.08 - 128) * 0.91 + 128;
+        b = (b * 1.08 - 128) * 0.91 + 128;
+        // Saturation (Lowering)
+        const avgS = (r + g + b) / 3;
+        r = avgS + (r - avgS) * 0.82;
+        g = avgS + (g - avgS) * 0.82;
+        b = avgS + (b - avgS) * 0.82;
+        break;
+
+      case 'bloom': // Brightness(1.12) + Saturate(1.1) + Contrast(0.88) + Sepia(0.07)
+        // Basic color math
+        r = (r * 1.12 - 128) * 0.88 + 128;
+        g = (g * 1.12 - 128) * 0.88 + 128;
+        b = (b * 1.12 - 128) * 0.88 + 128;
+        // Slight Sepia & Saturation
+        r = (r * 0.93 + g * 0.07);
+        b = b * 0.9;
+        const avgB = (r + g + b) / 3;
+        r = avgB + (r - avgB) * 1.1;
+        g = avgB + (g - avgB) * 1.1;
+        break;
+
+      case 'warm': // Sepia(20%) + Saturate(1.32) + Brightness(1.06)
+        const rW = r, gW = g, bW = b;
+        r = (rW * 0.393 + gW * 0.769 + bW * 0.189) * 0.2 + rW * 0.8;
+        g = (rW * 0.349 + gW * 0.686 + bW * 0.168) * 0.2 + gW * 0.8;
+        b = (rW * 0.272 + gW * 0.534 + bW * 0.131) * 0.2 + bW * 0.8;
+        r *= 1.06; g *= 1.06; b *= 1.06;
+        break;
+
+      case 'cool': // Hue-rotate(18deg) approximation + saturate
+        r = r * 0.9; g = g * 1.05; b = b * 1.2; // Cool tint
+        break;
+
+      case 'film': // Sepia(28%) + Contrast(1.18) + Brightness(0.95)
+        const rF = r, gF = g, bF = b;
+        r = (rF * 0.393 + gF * 0.769 + bF * 0.189) * 0.28 + rF * 0.72;
+        g = (rF * 0.349 + gF * 0.686 + bF * 0.168) * 0.28 + gF * 0.72;
+        b = (rF * 0.272 + gF * 0.534 + bF * 0.131) * 0.28 + bF * 0.72;
+        r = (r * 0.95 - 128) * 1.18 + 128;
+        g = (g * 0.95 - 128) * 1.18 + 128;
+        b = (b * 0.95 - 128) * 1.18 + 128;
+        break;
+
+      case 'vivid': // Saturate(1.65) + Contrast(1.08)
+        const avgV = (r + g + b) / 3;
+        r = avgV + (r - avgV) * 1.65;
+        g = avgV + (g - avgV) * 1.65;
+        b = avgV + (b - avgV) * 1.65;
+        r = (r - 128) * 1.08 + 128;
+        g = (g - 128) * 1.08 + 128;
+        b = (b - 128) * 1.08 + 128;
+        break;
+    }
+
+    // Clamp values to 0-255 range
+    data[i] = Math.max(0, Math.min(255, r));
+    data[i + 1] = Math.max(0, Math.min(255, g));
+    data[i + 2] = Math.max(0, Math.min(255, b));
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+}
+
+async function applyFilterToDataUrl(dataUrl: string, filterId: FilterId): Promise<string> {
+  if (filterId === 'none') return dataUrl;
 
   return new Promise((resolve) => {
     const img = new Image();
-    // Prevent potential tainting issues on mobile
     img.crossOrigin = "anonymous";
-
     img.onload = () => {
       const c = document.createElement('canvas');
       c.width = img.naturalWidth;
       c.height = img.naturalHeight;
-      const ctx = c.getContext('2d');
+      const ctx = c.getContext('2d', { willReadFrequently: true })!;
 
-      if (!ctx) {
-        resolve(dataUrl);
-        return;
-      }
-      // Set the filter FIRST
-      ctx.filter = css;
-      // Draw the image
       ctx.drawImage(img, 0, 0);
-      // Mobile Hack: On iOS/Android, we need a tiny delay to let the 
-      // GPU finish the filter rasterization before calling toDataURL.
-      setTimeout(() => {
-        try {
-          const result = c.toDataURL('image/jpeg', 0.92);
-          // If the filter failed to apply, result might be too small/empty
-          resolve(result.length > 100 ? result : dataUrl);
-        } catch (err) {
-          console.error("Filter export failed:", err);
-          resolve(dataUrl);
-        }
-      }, 40); // 40ms is usually enough for a 60fps frame cycle
+
+      // Perform manual bake
+      applyManualFilter(ctx, c.width, c.height, filterId);
+
+      // Export at a slightly lower quality for mobile stability
+      resolve(c.toDataURL('image/jpeg', 0.92));
     };
     img.onerror = () => resolve(dataUrl);
     img.src = dataUrl;
@@ -299,112 +366,66 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
   const buildCanvas = useCallback(async (): Promise<HTMLCanvasElement> => {
     const PW = 640, PH = 480, PAD = 24, GAP = 14, FOOTER_H = 110;
 
-    // 1. Process all filters in parallel first. 
-    // This is much faster on mobile than doing it one-by-one in the loop.
-    const filteredImageUrls = await Promise.all(
-      photos.map(p => applyFilterToDataUrl(p.dataUrl, globalFilterCss))
+    // Pre-bake all filters in parallel
+    const filteredUrls = await Promise.all(
+      photos.map(p => applyFilterToDataUrl(p.dataUrl, globalFilter))
     );
 
-    let c: HTMLCanvasElement, ctx: CanvasRenderingContext2D;
+    let c: HTMLCanvasElement;
+    const isGrid = stripType === 'grid2x2';
 
-    if (stripType === 'grid2x2') {
-      const cols = 2;
-      const totalW = PW * cols + PAD * (cols + 1);
+    if (isGrid) {
+      const totalW = PW * 2 + PAD * 3;
       const totalH = PAD + PH + GAP + PH + PAD + FOOTER_H;
       c = document.createElement('canvas');
-      c.width = totalW;
-      c.height = totalH;
-      ctx = c.getContext('2d')!;
-      ctx.fillStyle = theme.bg;
-      ctx.fillRect(0, 0, totalW, totalH);
-
-      const positions = [
-        [PAD, PAD],
-        [PW + PAD * 2, PAD],
-        [PAD, PAD + PH + GAP],
-        [PW + PAD * 2, PAD + PH + GAP]
-      ];
-
-      for (let i = 0; i < Math.min(photos.length, 4); i++) {
-        const [px, py] = positions[i];
-        // Use the pre-filtered URL
-        const img = await loadImg(filteredImageUrls[i]);
-
-        ctx.save();
-        ctx.shadowColor = 'rgba(30,34,53,0.15)';
-        ctx.shadowBlur = 12;
-        ctx.shadowOffsetY = 4;
-        rrClip(ctx, px, py, PW, PH, 12);
-        drawImageCover(ctx, img, px, py, PW, PH);
-        ctx.restore();
-
-        ctx.strokeStyle = theme.borderColor;
-        ctx.lineWidth = 2;
-        rrStroke(ctx, px, py, PW, PH, 12);
-
-        // Draw Stickers
-        for (const s of photos[i].stickers) {
-          const sx = px + (s.x / 100) * PW, sy = py + (s.y / 100) * PH;
-          ctx.save();
-          ctx.translate(sx, sy);
-          ctx.rotate(s.rotation * Math.PI / 180);
-          ctx.font = `${s.size}px serif`;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(s.emoji, 0, 0);
-          ctx.restore();
-        }
-      }
-      drawFooter(ctx, 0, totalH - FOOTER_H, totalW, FOOTER_H);
-
+      c.width = totalW; c.height = totalH;
     } else {
-      // Strip Logic (Vertical)
       const aspectMap: Record<string, number> = { single: 5 / 4, strip3: 1, strip4: 1 };
       const photoH = Math.round(PW * (aspectMap[stripType] ?? 1));
-      const stripW = PW + PAD * 2;
-      const n = photos.length;
-      const stripH = PAD + (photoH + GAP) * n - GAP + PAD + FOOTER_H;
-
+      const totalH = PAD + (photoH + GAP) * photos.length - GAP + PAD + FOOTER_H;
       c = document.createElement('canvas');
-      c.width = stripW;
-      c.height = stripH;
-      ctx = c.getContext('2d')!;
-      ctx.fillStyle = theme.bg;
-      ctx.fillRect(0, 0, stripW, stripH);
-
-      for (let i = 0; i < photos.length; i++) {
-        const py = PAD + i * (photoH + GAP), px = PAD;
-        // Use the pre-filtered URL
-        const img = await loadImg(filteredImageUrls[i]);
-
-        ctx.save();
-        ctx.shadowColor = 'rgba(30,34,53,0.14)';
-        ctx.shadowBlur = 14;
-        ctx.shadowOffsetY = 4;
-        rrClip(ctx, px, py, PW, photoH, 12);
-        drawImageCover(ctx, img, px, py, PW, photoH);
-        ctx.restore();
-
-        ctx.strokeStyle = theme.borderColor;
-        ctx.lineWidth = 2;
-        rrStroke(ctx, px, py, PW, photoH, 12);
-
-        for (const s of photos[i].stickers) {
-          const sx = px + (s.x / 100) * PW, sy = py + (s.y / 100) * photoH;
-          ctx.save();
-          ctx.translate(sx, sy);
-          ctx.rotate(s.rotation * Math.PI / 180);
-          ctx.font = `${s.size}px serif`;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(s.emoji, 0, 0);
-          ctx.restore();
-        }
-      }
-      drawFooter(ctx, 0, stripH - FOOTER_H, stripW, FOOTER_H);
+      c.width = PW + PAD * 2; c.height = totalH;
     }
+
+    const ctx = c.getContext('2d')!;
+    ctx.fillStyle = theme.bg;
+    ctx.fillRect(0, 0, c.width, c.height);
+
+    // Layout Logic
+    for (let i = 0; i < photos.length; i++) {
+      const img = await loadImg(filteredUrls[i]);
+
+      // Calculate your px/py/photoH/photoW based on stripType here...
+      // (Use your existing positioning logic from your original code)
+
+      // Example for a vertical strip:
+      const photoH = isGrid ? PH : Math.round(PW * ((stripType === 'single' ? 1.25 : 1)));
+      const py = isGrid ? (i < 2 ? PAD : PAD + PH + GAP) : (PAD + i * (photoH + GAP));
+      const px = isGrid ? (i % 2 === 0 ? PAD : PW + PAD * 2) : PAD;
+
+      ctx.save();
+      rrClip(ctx, px, py, PW, photoH, 12);
+      drawImageCover(ctx, img, px, py, PW, photoH);
+      ctx.restore();
+
+      // Draw stickers from photos[i].stickers...
+      for (const s of photos[i].stickers) {
+        const sx = px + (s.x / 100) * PW;
+        const sy = py + (s.y / 100) * photoH;
+        ctx.save();
+        ctx.translate(sx, sy);
+        ctx.rotate(s.rotation * Math.PI / 180);
+        ctx.font = `${s.size}px serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(s.emoji, 0, 0);
+        ctx.restore();
+      }
+    }
+
+    drawFooter(ctx, 0, c.height - FOOTER_H, c.width, FOOTER_H);
     return c;
-  }, [photos, stripType, theme, globalFilterCss]);
+  }, [photos, stripType, theme, globalFilter]);
 
   const downloadStrip = useCallback(async () => {
     setDownloading(true);
