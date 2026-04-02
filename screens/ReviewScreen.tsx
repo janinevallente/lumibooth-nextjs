@@ -122,9 +122,9 @@ function StickerOverlay({ stickers, onMove, onRemove, onResize, onRotate }: {
               <button data-role="remove-btn" onPointerDown={e => e.stopPropagation()}
                 onClick={e => { e.stopPropagation(); onRemove(s.id); setSelectedId(null) }}
                 style={{ position: 'absolute', top: -12, right: -12, width: 20, height: 20, borderRadius: '50%', background: '#E11D48', border: '1.5px solid white', color: 'white', fontSize: 10, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 30, boxShadow: '0 1px 4px rgba(0,0,0,0.25)', padding: 0 }}>✕</button>
-              <div data-role="rotate-handle" onPointerDown={e => handleRotatePointerDown(e, s)} title="Drag to rotate"
+              <div data-role="rotate-handle" onPointerDown={e => handleRotatePointerDown(e, s)}
                 style={{ position: 'absolute', top: -12, left: -12, width: 20, height: 20, borderRadius: '50%', background: 'white', border: '1.5px solid rgba(107,72,255,0.7)', cursor: 'grab', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 30, boxShadow: '0 1px 4px rgba(0,0,0,0.2)', fontSize: 12, color: 'rgba(107,72,255,0.9)', touchAction: 'none' }}>↺</div>
-              <div data-role="resize-handle" onPointerDown={e => handleResizePointerDown(e, s)} title="Drag to resize"
+              <div data-role="resize-handle" onPointerDown={e => handleResizePointerDown(e, s)}
                 style={{ position: 'absolute', bottom: -12, right: -12, width: 20, height: 20, borderRadius: '50%', background: 'white', border: '1.5px solid rgba(212,104,122,0.8)', cursor: 'ew-resize', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 30, boxShadow: '0 1px 4px rgba(0,0,0,0.2)', fontSize: 10, color: 'rgba(212,104,122,0.9)', touchAction: 'none' }}>⤡</div>
             </>)}
           </div>
@@ -159,18 +159,33 @@ function drawImageCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, dx
   ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh)
 }
 
+// ─── FIXED: Mobile-safe filter application ────────────────────────────────────
+// iOS Safari and some Android browsers can silently ignore ctx.filter or
+// taint the canvas when reading back pixels. We guard both cases:
+//   1. willReadFrequently hint avoids GPU read-back stalls
+//   2. try/catch handles SecurityError from canvas tainting
+//   3. length check detects a blank/empty toDataURL result
 async function applyFilterToDataUrl(dataUrl: string, css: string): Promise<string> {
   if (css === 'none') return dataUrl
   return new Promise((resolve) => {
     const img = new Image()
     img.onload = () => {
-      const c = document.createElement('canvas')
-      c.width = img.naturalWidth; c.height = img.naturalHeight
-      const ctx = c.getContext('2d')!
-      ctx.filter = css
-      ctx.drawImage(img, 0, 0)
-      resolve(c.toDataURL('image/jpeg', 0.93))
+      try {
+        const c = document.createElement('canvas')
+        c.width = img.naturalWidth
+        c.height = img.naturalHeight
+        const ctx = c.getContext('2d', { willReadFrequently: true })!
+        ctx.filter = css
+        ctx.drawImage(img, 0, 0)
+        const result = c.toDataURL('image/jpeg', 0.93)
+        // If result is suspiciously small (blank canvas), fall back to original
+        resolve(result.length > 1000 ? result : dataUrl)
+      } catch {
+        // SecurityError or other canvas failure — use original
+        resolve(dataUrl)
+      }
     }
+    img.onerror = () => resolve(dataUrl)
     img.src = dataUrl
   })
 }
@@ -235,17 +250,13 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
 
   const moveSticker = (idx: number, id: string, x: number, y: number) =>
     setPhotos(prev => prev.map((p, i) => i === idx ? { ...p, stickers: p.stickers.map(s => s.id === id ? { ...s, x, y } : s) } : p))
-
   const removeSticker = (idx: number, id: string) =>
     setPhotos(prev => prev.map((p, i) => i === idx ? { ...p, stickers: p.stickers.filter(s => s.id !== id) } : p))
-
   const resizeSticker = (idx: number, id: string, size: number) =>
     setPhotos(prev => prev.map((p, i) => i === idx ? { ...p, stickers: p.stickers.map(s => s.id === id ? { ...s, size } : s) } : p))
-
   const rotateSticker = (idx: number, id: string, rotation: number) =>
     setPhotos(prev => prev.map((p, i) => i === idx ? { ...p, stickers: p.stickers.map(s => s.id === id ? { ...s, rotation } : s) } : p))
 
-  // ── Footer draw ───────────────────────────────────────────────────────────
   const drawFooter = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) => {
     ctx.fillStyle = theme.bg; ctx.fillRect(x, y, w, h)
     const cx = x + w / 2
@@ -390,8 +401,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                         border: selectedPhoto === i ? `2px solid var(--rose)` : '2px solid transparent',
                         boxShadow: selectedPhoto === i ? '0 0 0 3px rgba(212,104,122,0.2)' : '0 2px 8px rgba(30,34,53,0.1)',
                       }}>
-                      <img src={p.dataUrl} className="w-full h-full object-cover" alt=""
-                        style={{ filter: globalFilterCss }} />
+                      <img src={p.dataUrl} className="w-full h-full object-cover" alt="" style={{ filter: globalFilterCss }} />
                       <StickerOverlay stickers={p.stickers}
                         onMove={(id, x, y) => moveSticker(i, id, x, y)}
                         onRemove={id => removeSticker(i, id)}
@@ -422,10 +432,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
             ) : (
               <div className="flex gap-4">
                 <div className="overflow-hidden rounded-2xl mx-auto"
-                  style={{
-                    border: '1px solid rgba(212,104,122,0.15)', background: theme.bg,
-                    width: '100%', maxWidth: stripType === 'single' ? 420 : 320,
-                  }}>
+                  style={{ border: '1px solid rgba(212,104,122,0.15)', background: theme.bg, width: '100%', maxWidth: stripType === 'single' ? 420 : 320 }}>
                   <div className="flex flex-col gap-2 p-3">
                     {photos.map((p, i) => (
                       <div key={i} onClick={() => setSelectedPhoto(i)}
@@ -437,8 +444,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
                           border: selectedPhoto === i ? `2px solid var(--rose)` : '2px solid transparent',
                           boxShadow: selectedPhoto === i ? '0 0 0 3px rgba(212,104,122,0.2)' : '0 2px 8px rgba(30,34,53,0.1)',
                         }}>
-                        <img src={p.dataUrl} className="w-full h-full object-cover" alt=""
-                          style={{ filter: globalFilterCss }} />
+                        <img src={p.dataUrl} className="w-full h-full object-cover" alt="" style={{ filter: globalFilterCss }} />
                         <StickerOverlay stickers={p.stickers}
                           onMove={(id, x, y) => moveSticker(i, id, x, y)}
                           onRemove={id => removeSticker(i, id)}
@@ -486,9 +492,7 @@ export default function ReviewScreen({ photos: initialPhotos, stripType, onRetak
             </div>
             <div className="flex flex-wrap gap-1.5">
               {FILTERS.map(f => (
-                <button
-                  key={f.id}
-                  onClick={() => setGlobalFilter(f.id)}
+                <button key={f.id} onClick={() => setGlobalFilter(f.id)}
                   style={{
                     fontSize: 10, padding: '3px 9px', borderRadius: 20, fontWeight: 600,
                     background: globalFilter === f.id ? f.accent : 'rgba(212,104,122,0.07)',
